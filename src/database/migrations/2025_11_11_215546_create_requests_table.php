@@ -10,16 +10,19 @@ class CreateRequestsTable extends Migration
     {
         Schema::create('requests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('attendance_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->text('reason');
-            $table->tinyInteger('status')->default(0);   // 0:申請中 / 1:承認済
+            $table->foreignId('operate_user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('target_user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('attendance_id')->nullable()->constrained('attendances')->nullOnDelete();
+            // 修正対象の勤怠レコード（新規追加の場合は NULL）
+            $table->tinyInteger('type')->default(1);    // 種別: 0=新規追加, 1=修正, 2=削除
+            $table->text('reason');                     // 申請理由
+            $table->tinyInteger('status')->default(0);  // 0:申請中 / 1:承認済
             $table->timestamps();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('attendance_requests');
+        Schema::dropIfExists('requests');
     }
 }

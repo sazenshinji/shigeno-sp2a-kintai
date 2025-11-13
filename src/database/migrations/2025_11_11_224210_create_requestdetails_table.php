@@ -12,6 +12,7 @@ class CreateRequestDetailsTable extends Migration
             $table->id();
             $table->foreignId('request_id')->constrained('requests')->cascadeOnDelete();
             $table->tinyInteger('field_id'); // 0:clock_in / 1:clock_out / 2:break_start / 3:break_end
+            $table->tinyInteger('break_index')->nullable(); //休憩番号:field_id が 2,3 の場合は必須
             $table->dateTime('before_value')->nullable();
             $table->dateTime('after_value');
             $table->timestamps();
@@ -20,6 +21,6 @@ class CreateRequestDetailsTable extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('request_details');
+        Schema::dropIfExists('requestdetails');
     }
 }
