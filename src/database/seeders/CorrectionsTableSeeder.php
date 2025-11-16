@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class RequestsTableSeeder extends Seeder
+class CorrectionsTableSeeder extends Seeder
 {
     public function run()
     {
@@ -19,7 +19,7 @@ class RequestsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requests')->insert($param);
+        DB::table('corrections')->insert($param);
         $param = [
             'operate_user_id' => 1,                  // 大谷 翔平
             'target_user_id' => 1,                   // 大谷 翔平
@@ -30,7 +30,7 @@ class RequestsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requests')->insert($param);
+        DB::table('corrections')->insert($param);
         $param = [
             'operate_user_id' => 1,    // 大谷 翔平
             'target_user_id' => 1,     // 大谷 翔平
@@ -41,7 +41,7 @@ class RequestsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requests')->insert($param);
+        DB::table('corrections')->insert($param);
         $param = [
             'operate_user_id' => 6,            // (代)鈴木 花子
             'target_user_id' => 1,             // 大谷 翔平
@@ -52,6 +52,6 @@ class RequestsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requests')->insert($param);
+        DB::table('corrections')->insert($param);
     }
 }

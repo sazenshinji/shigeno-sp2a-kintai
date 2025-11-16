@@ -6,13 +6,13 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 
-class RequestdetailsTableSeeder extends Seeder
+class CorrectionDetailsTableSeeder extends Seeder
 {
     public function run()
     {
         //----2025年11月5日(水) 大谷 翔平 【修正】----
         $param = [
-            'request_id' => 1,                                      // FK
+            'correction_id' => 1,                                   // FK
             'field_id' => 0,                                        // 0:clock_in
             'break_index' => null,                                  // 休憩番号
             'before_value' => null,                                 // 変更前-日時
@@ -20,9 +20,9 @@ class RequestdetailsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requestdetails')->insert($param);
+        DB::table('correctiondetails')->insert($param);
         $param = [
-            'request_id' => 1,                                      // FK
+            'correction_id' => 1,                                   // FK
             'field_id' => 1,                                        // 1:clock_out
             'break_index' => null,                                  // 休憩番号
             'before_value' => null,                                 // 変更前-日時
@@ -30,9 +30,9 @@ class RequestdetailsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requestdetails')->insert($param);
+        DB::table('correctiondetails')->insert($param);
         $param = [
-            'request_id' => 1,                                      // FK
+            'correction_id' => 1,                                   // FK
             'field_id' => 2,                                        // 2:break_start
             'break_index' => 1,                                     // 休憩番号
             'before_value' => null,                                 // 変更前-日時
@@ -40,9 +40,9 @@ class RequestdetailsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requestdetails')->insert($param);
+        DB::table('correctiondetails')->insert($param);
         $param = [
-            'request_id' => 1,                                      // FK
+            'correction_id' => 1,                                   // FK
             'field_id' => 3,                                        // 3:break_end
             'break_index' => 1,                                     // 休憩番号
             'before_value' => null,                                 // 変更前-日時
@@ -50,9 +50,9 @@ class RequestdetailsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requestdetails')->insert($param);
+        DB::table('correctiondetails')->insert($param);
         $param = [
-            'request_id' => 1,                                      // FK
+            'correction_id' => 1,                                   // FK
             'field_id' => 2,                                        // 2:break_start
             'break_index' => 2,                                     // 休憩番号
             'before_value' => null,                                 // 変更前-日時
@@ -60,9 +60,9 @@ class RequestdetailsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requestdetails')->insert($param);
+        DB::table('correctiondetails')->insert($param);
         $param = [
-            'request_id' => 1,                                      // FK
+            'correction_id' => 1,                                   // FK
             'field_id' => 3,                                        // 3:break_end
             'break_index' => 2,                                     // 休憩番号
             'before_value' => null,                                 // 変更前-日時
@@ -70,11 +70,11 @@ class RequestdetailsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requestdetails')->insert($param);
+        DB::table('correctiondetails')->insert($param);
 
         //----2025年11月8日(土) 大谷 翔平 【追加】----
         $param = [
-            'request_id' => 2,                                      // FK
+            'correction_id' => 2,                                   // FK
             'field_id' => 0,                                        // 0:clock_in
             'break_index' => null,                                  // 休憩番号
             'before_value' => null,                                 // 変更前-日時
@@ -82,9 +82,9 @@ class RequestdetailsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requestdetails')->insert($param);
+        DB::table('correctiondetails')->insert($param);
         $param = [
-            'request_id' => 2,                                      // FK
+            'correction_id' => 2,                                   // FK
             'field_id' => 1,                                        // 1:clock_out
             'break_index' => null,                                  // 休憩番号
             'before_value' => null,                                 // 変更前-日時
@@ -92,9 +92,9 @@ class RequestdetailsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requestdetails')->insert($param);
+        DB::table('correctiondetails')->insert($param);
         $param = [
-            'request_id' => 2,                                      // FK
+            'correction_id' => 2,                                   // FK
             'field_id' => 2,                                        // 2:break_start
             'break_index' => 1,                                     // 休憩番号
             'before_value' => null,                                 // 変更前-日時
@@ -102,9 +102,9 @@ class RequestdetailsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requestdetails')->insert($param);
+        DB::table('correctiondetails')->insert($param);
         $param = [
-            'request_id' => 2,                                      // FK
+            'correction_id' => 2,                                   // FK
             'field_id' => 3,                                        // 3:break_end
             'break_index' => 1,                                     // 休憩番号
             'before_value' => null,                                 // 変更前-日時
@@ -112,14 +112,14 @@ class RequestdetailsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requestdetails')->insert($param);
+        DB::table('correctiondetails')->insert($param);
 
         //----2025年12月1日(月) 大谷 翔平 【削除】----
-        //　　削除の場合、requestdetailsテーブルの登録はない。
+        //　　削除の場合、correctiondetailsテーブルの登録はない。
 
         //----2025年12月2日(火) 大谷 翔平 【代理修正】----
         $param = [
-            'request_id' => 4,                                      // FK
+            'correction_id' => 4,                                   // FK
             'field_id' => 0,                                        // 0:clock_in
             'break_index' => null,                                  // 休憩番号
             'before_value' => null,                                 // 変更前-日時
@@ -127,9 +127,9 @@ class RequestdetailsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requestdetails')->insert($param);
+        DB::table('correctiondetails')->insert($param);
         $param = [
-            'request_id' => 4,                                      // FK
+            'correction_id' => 4,                                   // FK
             'field_id' => 1,                                        // 1:clock_out
             'break_index' => null,                                  // 休憩番号
             'before_value' => null,                                 // 変更前-日時
@@ -137,9 +137,9 @@ class RequestdetailsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requestdetails')->insert($param);
+        DB::table('correctiondetails')->insert($param);
         $param = [
-            'request_id' => 4,                                      // FK
+            'correction_id' => 4,                                   // FK
             'field_id' => 2,                                        // 2:break_start
             'break_index' => 1,                                     // 休憩番号
             'before_value' => null,                                 // 変更前-日時
@@ -147,9 +147,9 @@ class RequestdetailsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requestdetails')->insert($param);
+        DB::table('correctiondetails')->insert($param);
         $param = [
-            'request_id' => 4,                                      // FK
+            'correction_id' => 4,                                   // FK
             'field_id' => 3,                                        // 3:break_end
             'break_index' => 1,                                     // 休憩番号
             'before_value' => null,                                 // 変更前-日時
@@ -157,6 +157,6 @@ class RequestdetailsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('requestdetails')->insert($param);
+        DB::table('correctiondetails')->insert($param);
     }
 }

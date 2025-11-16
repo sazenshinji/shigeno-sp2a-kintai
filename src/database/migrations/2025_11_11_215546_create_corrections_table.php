@@ -4,11 +4,11 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRequestsTable extends Migration
+class CreateCorrectionsTable extends Migration
 {
     public function up()
     {
-        Schema::create('requests', function (Blueprint $table) {
+        Schema::create('corrections', function (Blueprint $table) {
             $table->id();
             $table->foreignId('operate_user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('target_user_id')->constrained('users')->cascadeOnDelete();
@@ -23,6 +23,6 @@ class CreateRequestsTable extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('requests');
+        Schema::dropIfExists('corrections');
     }
 }
