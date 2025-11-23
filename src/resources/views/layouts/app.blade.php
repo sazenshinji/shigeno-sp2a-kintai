@@ -24,6 +24,21 @@
       </a>
     </div>
 
+    <nav class="nav-menu">
+      <ul>
+        <li><a href="{{ url('/attendance') }}">勤怠</a></li>
+        <li><a href="{{ url('/attendance/list') }}">勤怠一覧</a></li>
+        <li><a href="{{ url('/attendance/request') }}">申請</a></li>
+
+        {{-- ログアウトフォーム --}}
+        <li>
+          <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit" class="logout-btn">ログアウト</button>
+          </form>
+        </li>
+      </ul>
+    </nav>
 
     </div>
 

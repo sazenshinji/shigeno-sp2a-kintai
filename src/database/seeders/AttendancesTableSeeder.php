@@ -399,8 +399,8 @@ class AttendancesTableSeeder extends Seeder
         $param = [
             'user_id'    => 1,
             'work_date'  => '2025-12-2',
-            'clock_in'   => Carbon::create(2025, 12, 2, 9, 0, 0),
-            'clock_out'  => Carbon::create(2025, 12, 2, 18, 0, 0),
+            'clock_in'   => Carbon::create(2025, 12, 2, 7, 0, 0),
+            'clock_out'  => Carbon::create(2025, 12, 2, 21, 0, 0),
             'status'     => 3,
             'created_at' => now(),
             'updated_at' => now(),

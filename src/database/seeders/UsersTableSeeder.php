@@ -5,9 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Carbon;
-
-
 
 class UsersTableSeeder extends Seeder
 {
@@ -52,7 +49,7 @@ class UsersTableSeeder extends Seeder
 
 
         $param = [
-            'name' => '山田 太郎',
+            'name' => '長嶋 茂雄',
             'email' => '1234@abcd5',
             'password' => Hash::make('12345678'),
             'role' => 1,
@@ -61,7 +58,7 @@ class UsersTableSeeder extends Seeder
         ];
         DB::table('users')->insert($param);
         $param = [
-            'name' => '鈴木 花子',
+            'name' => '澤 穂希',
             'email' => '1234@abcd6',
             'password' => Hash::make('12345678'),
             'role' => 1,
