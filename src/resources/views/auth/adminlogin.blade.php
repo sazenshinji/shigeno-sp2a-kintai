@@ -8,7 +8,7 @@
 <div class="auth-container">
 
   <h2>管理者ログイン</h2>
-  <form method="POST" action="{{ route('admin.login') }}" novalidate>
+  <form method="POST" action="{{ route('login') }}" novalidate>
     @csrf
 
     {{-- メールアドレス --}}

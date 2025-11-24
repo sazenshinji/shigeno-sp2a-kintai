@@ -14,31 +14,24 @@ class FortifyServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        // ⭐ ログイン後の遷移分岐登録
         $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
     }
 
     public function boot(): void
     {
-
         Fortify::createUsersUsing(CreateNewUser::class);
 
-        // 一般ログイン
+        // Fortifyによるログイン画面
         Fortify::loginView(function () {
+            // login_roleはWebルート側で設定するため、ここでは不要に
             return view('auth.login');
         });
 
-        // 一般会員登録画面
+        // 会員登録画面（一般のみ）
         Fortify::registerView(function () {
             return view('auth.register');
         });
 
-        // ⭐ 管理者ログイン
-        \Route::get('/admin/login', function () {
-            return view('auth.adminlogin');
-        })->name('admin.login');
-
-        // ⭐ 認証条件をURLで分岐
         Fortify::authenticateUsing(function ($request) {
             $user = User::where('email', $request->email)->first();
 
@@ -46,13 +39,17 @@ class FortifyServiceProvider extends ServiceProvider
                 return null;
             }
 
-            // 管理者ログインURL
-            if ($request->is('admin/login')) {
+            $loginRole = session('login_role');
+
+            if ($loginRole === 'admin') {
                 return $user->role === 1 ? $user : null;
             }
 
-            // 一般ログインURL
-            return $user->role === 0 ? $user : null;
+            if ($loginRole === 'user') {
+                return $user->role === 0 ? $user : null;
+            }
+
+            return null;
         });
     }
 }
