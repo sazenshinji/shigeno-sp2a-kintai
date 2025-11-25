@@ -9,12 +9,20 @@ Route::get('/', fn() => redirect('/login'));
 
 // 管理者ログイン画面
 Route::middleware('guest')->get('/admin/login', function () {
-    session(['login_role' => 'admin']); // ⭐ここを追加！
+    session(['login_role' => 'admin']);
     return view('auth.adminlogin');
 })->name('admin.login');
 
 // 一般ユーザー向けページ
-Route::middleware(['auth'])->get('/attendance', [AttendanceController::class, 'index'])->name('attendance');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance');
+
+    // 打刻用ルート
+    Route::post('/attendance/clock-in', [AttendanceController::class, 'clockIn'])->name('attendance.clockIn');
+    Route::post('/attendance/clock-out', [AttendanceController::class, 'clockOut'])->name('attendance.clockOut');
+    Route::post('/attendance/break-in', [AttendanceController::class, 'breakIn'])->name('attendance.breakIn');
+    Route::post('/attendance/break-out', [AttendanceController::class, 'breakOut'])->name('attendance.breakOut');
+});
 
 // 管理者専用ページ
 Route::middleware(['auth', 'admin'])->get('/admin/attendance/list', fn() => view('admin.daily'))->name('admin.daily');

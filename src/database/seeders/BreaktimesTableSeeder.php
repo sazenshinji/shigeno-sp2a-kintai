@@ -173,8 +173,10 @@ class BreaktimesTableSeeder extends Seeder
         $param = [
             'attendance_id' => 15,
             'break_index'     => 1,
-            'break_start'   => Carbon::create(2025, 11, 25, 12, 0, 0),
-            'break_end'     => Carbon::create(2025, 11, 25, 13, 0, 0),
+//            'break_start'   => Carbon::create(2025, 11, 25, 12, 0, 0),
+//            'break_end'     => Carbon::create(2025, 11, 25, 13, 0, 0),
+            'break_start'   => Carbon::create(2025, 1, 25, 12, 0, 0),
+            'break_end'     => Carbon::create(2025, 1, 25, 13, 0, 0),
             'created_at' => now(),
             'updated_at' => now(),
         ];
