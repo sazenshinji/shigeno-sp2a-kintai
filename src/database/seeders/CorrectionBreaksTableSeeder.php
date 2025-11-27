@@ -12,7 +12,7 @@ class CorrectionBreaksTableSeeder extends Seeder
     {
         //----2025年11月5日(水) 大谷 翔平 【修正】----
         $param = [
-            'correction_id' => 1,                                           // FK
+            'correctioninout_id' => 1,                                           // FK
             'break_index' => 1,                                             // 休憩番号
             'after_break_start'   => Carbon::create(2025, 11, 5, 12, 30, 0),
             'after_break_end'     => Carbon::create(2025, 11, 5, 13, 15, 0),
@@ -21,7 +21,7 @@ class CorrectionBreaksTableSeeder extends Seeder
         ];
         DB::table('correctionbreaks')->insert($param);
         $param = [
-            'correction_id' => 1,                                           // FK
+            'correctioninout_id' => 1,                                           // FK
             'break_index' => 2,                                             // 休憩番号
             'after_break_start'   => Carbon::create(2025, 11, 5, 15, 15, 0),
             'after_break_end'     => Carbon::create(2025, 11, 5, 15, 45, 0),
@@ -32,7 +32,7 @@ class CorrectionBreaksTableSeeder extends Seeder
 
         //----2025年11月8日(土) 大谷 翔平 【追加】----
         $param = [
-            'correction_id' => 2,                                           // FK
+            'correctioninout_id' => 2,                                           // FK
             'break_index' => 1,                                             // 休憩番号
             'after_break_start'   => Carbon::create(2025, 11, 8, 12, 15, 0),
             'after_break_end'     => Carbon::create(2025, 11, 8, 12, 45, 0),
@@ -46,7 +46,7 @@ class CorrectionBreaksTableSeeder extends Seeder
 
         //----2025年12月2日(火) 大谷 翔平 【代理修正】----
         $param = [
-            'correction_id' => 4,                                           // FK
+            'correctioninout_id' => 3,                                           // FK
             'break_index' => 1,                                             // 休憩番号
             'after_break_start'   => Carbon::create(2025, 12, 2, 12, 15, 0),
             'after_break_end'     => Carbon::create(2025, 12, 2, 13, 15, 0),

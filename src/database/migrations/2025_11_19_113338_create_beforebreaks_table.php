@@ -15,6 +15,8 @@ class CreateBeforebreaksTable extends Migration
             $table->dateTime('before_break_start');
             $table->dateTime('before_break_end')->nullable();
             $table->timestamps();
+
+            $table->unique(['beforecorrection_id', 'break_index']);
         });
     }
 

@@ -186,12 +186,9 @@ class AttendancesTableSeeder extends Seeder
         //----2025年11月25日(火)----
         $param = [
             'user_id'    => 1,                                  //大谷 翔平
-//            'work_date'  => '2025-11-25',
-//            'clock_in'   => Carbon::create(2025, 11, 25, 9, 0, 0),
-//            'clock_out'  => Carbon::create(2025, 11, 25, 18, 0, 0),
-            'work_date'  => '2025-1-25',
-            'clock_in'   => Carbon::create(2025, 1, 25, 9, 0, 0),
-            'clock_out'  => Carbon::create(2025, 1, 25, 18, 0, 0),
+            'work_date'  => '2025-11-25',
+            'clock_in'   => Carbon::create(2025, 11, 25, 9, 0, 0),
+            'clock_out'  => Carbon::create(2025, 11, 25, 18, 0, 0),
             'status'     => 3,
             'created_at' => now(),
             'updated_at' => now(),
@@ -231,9 +228,12 @@ class AttendancesTableSeeder extends Seeder
         //----2025年11月26日(水)----
         $param = [
             'user_id'    => 1,
-            'work_date'  => '2025-11-26',
-            'clock_in'   => Carbon::create(2025, 11, 26, 9, 0, 0),
-            'clock_out'  => Carbon::create(2025, 11, 26, 18, 0, 0),
+//            'work_date'  => '2025-11-26',
+//            'clock_in'   => Carbon::create(2025, 11, 26, 9, 0, 0),
+//            'clock_out'  => Carbon::create(2025, 11, 26, 18, 0, 0),
+            'work_date'  => '2025-1-26',
+            'clock_in'   => Carbon::create(2025, 1, 26, 9, 0, 0),
+            'clock_out'  => Carbon::create(2025, 1, 26, 18, 0, 0),
             'status'     => 3,
             'created_at' => now(),
             'updated_at' => now(),

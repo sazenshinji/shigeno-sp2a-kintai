@@ -15,6 +15,8 @@ class CreateBreaktimesTable extends Migration
             $table->dateTime('break_start');
             $table->dateTime('break_end')->nullable();
             $table->timestamps();
+
+            $table->unique(['attendance_id', 'break_index']);
         });
     }
 

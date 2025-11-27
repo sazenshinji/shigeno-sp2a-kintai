@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
         $this->call(AttendancesTableSeeder::class);
         $this->call(BreaktimesTableSeeder::class);
         $this->call(CorrectionsTableSeeder::class);
+        $this->call(CorrectionInoutsTableSeeder::class);
         $this->call(CorrectionBreaksTableSeeder::class);
         $this->call(BeforeCorrectionsTableSeeder::class);
         $this->call(BeforeBreaksTableSeeder::class);

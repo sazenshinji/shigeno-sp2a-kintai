@@ -17,9 +17,6 @@ class CreateCorrectionsTable extends Migration
             $table->tinyInteger('type')->default(1);    // 種別: 0=新規追加, 1=修正, 2=削除
             $table->text('reason');                     // 申請理由
             $table->tinyInteger('status')->default(0);  // 0:申請中 / 1:承認済
-            $table->date('after_work_date');
-            $table->dateTime('after_clock_in')->nullable();
-            $table->dateTime('after_clock_out')->nullable();
             $table->timestamps();
         });
     }
