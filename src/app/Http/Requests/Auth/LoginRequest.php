@@ -2,30 +2,29 @@
 
 namespace App\Http\Requests\Auth;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Laravel\Fortify\Http\Requests\LoginRequest as FortifyLoginRequest;
 
-class LoginRequest extends FormRequest
+class LoginRequest extends FortifyLoginRequest
 {
-    public function authorize()
-    {
-        return true;
-    }
+    // authorize() は Fortify 側で true になっているので通常そのままでOK
 
     public function rules()
     {
+        // Fortify の rules() を上書き（ここがあなたのバリデーション定義になる）
         return [
-            'email'    => ['required', 'email'],
-            'password' => ['required', 'string', 'min:8'],
+            'email'    => ['required', 'email', 'exists:users,email'],
+            'password' => ['required', 'string'],
         ];
     }
 
     public function messages()
     {
+        // あなたの好きなメッセージ
         return [
-            'email.required'    => 'メールアドレスを入力してください。',
-            'email.email'       => '正しいメール形式で入力してください。',
-            'password.required' => 'パスワードを入力してください。',
-            'password.min'      => 'パスワードは8文字以上で入力してください。',
+            'email.required'    => 'メールアドレスを入力してください',
+            'email.email'       => '正しいメール形式で入力してください',
+            'email.exists'      => 'ログイン情報が登録されていません',
+            'password.required' => 'パスワードを入力してください',
         ];
     }
 }

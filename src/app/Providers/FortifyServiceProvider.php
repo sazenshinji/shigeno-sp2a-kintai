@@ -4,8 +4,13 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\LoginResponse;
+
+use App\Http\Requests\Auth\LoginRequest as CustomLoginRequest;
+use Laravel\Fortify\Http\Requests\LoginRequest as FortifyLoginRequest;
+
 use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 use Laravel\Fortify\Fortify;
+
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\ServiceProvider;
 use App\Models\User;
@@ -17,7 +22,12 @@ class FortifyServiceProvider extends ServiceProvider
 {
     public function register()
     {
+        // ログイン後の遷移制御
         $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
+
+        // Fortify の LoginRequest を自作 LoginRequest に差し替え
+        $this->app->bind(FortifyLoginRequest::class, CustomLoginRequest::class);
+
     }
 
     public function boot(): void
@@ -49,27 +59,23 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
         // 認証処理 分岐
-        Fortify::authenticateUsing(function ($request) {
+        Fortify::authenticateUsing(function (Request $request) {
             $user = User::where('email', $request->email)->first();
 
             if (!$user || !Hash::check($request->password, $user->password)) {
-                // パスワード不一致 → ここで null → 失敗扱い
                 return null;
             }
 
             $loginRole = session('login_role');
 
-            // セッションに何もない場合は不正な流れとして失敗扱い
             if (!$loginRole) {
                 return null;
             }
 
-            // 管理者ログインとして来ている場合
             if ($loginRole === 'admin') {
                 return $user->role === 1 ? $user : null;
             }
 
-            // 一般ログインとして来ている場合
             if ($loginRole === 'user') {
                 return $user->role === 0 ? $user : null;
             }
