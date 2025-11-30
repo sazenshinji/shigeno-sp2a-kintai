@@ -82,5 +82,11 @@ class FortifyServiceProvider extends ServiceProvider
 
             return null;
         });
+
+        //verify-email メール認証誘導画面
+        Fortify::verifyEmailView(function () {
+            return view('auth.verify-email');
+        });
+
     }
 }

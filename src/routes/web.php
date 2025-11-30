@@ -14,7 +14,7 @@ Route::middleware('guest')->get('/admin/login', function () {
 })->name('admin.login');
 
 // 一般ユーザー向けページ
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance');
 
     // 打刻用ルート
