@@ -1,8 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\User\AttendanceController as UserAttendanceController;
+use App\Http\Controllers\Admin\ConfirmController as AdminConfirmController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Common_display\DisplayController;
 
 // 未ログインはログイン画面へ
 Route::get('/', fn() => redirect('/login'));
@@ -14,21 +16,30 @@ Route::middleware('guest')->get('/admin/login', function () {
 })->name('admin.login');
 
 // 一般ユーザー向けページ
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance');
+Route::middleware(['auth', 'verified'])
+    ->prefix('attendance')
+    ->group(function () {
+        // 勤怠ホーム（打刻画面）
+        Route::get('/', [UserAttendanceController::class, 'index'])->name('attendance');
 
-    // 打刻用ルート
-    Route::post('/attendance/clock-in', [AttendanceController::class, 'clockIn'])->name('attendance.clockIn');
-    Route::post('/attendance/clock-out', [AttendanceController::class, 'clockOut'])->name('attendance.clockOut');
-    Route::post('/attendance/break-in', [AttendanceController::class, 'breakIn'])->name('attendance.breakIn');
-    Route::post('/attendance/break-out', [AttendanceController::class, 'breakOut'])->name('attendance.breakOut');
+        // 打刻用ルート
+        Route::post('/clock-in', [UserAttendanceController::class, 'clockIn'])->name('attendance.clockIn');
+        Route::post('/clock-out', [UserAttendanceController::class, 'clockOut'])->name('attendance.clockOut');
+        Route::post('/break-in', [UserAttendanceController::class, 'breakIn'])->name('attendance.breakIn');
+        Route::post('/break-out', [UserAttendanceController::class, 'breakOut'])->name('attendance.breakOut');
 
-    // 勤怠一覧(ユーザー)
-    Route::get('/attendance/list', [AttendanceController::class, 'list'])->name('attendance.list');
-});
+    // 月次勤怠一覧表示
+    Route::get('/list', [DisplayController::class, 'monthly'])->name('attendance.list');
+    });
 
 // 管理者専用ページ
-Route::middleware(['auth', 'admin'])->get('/admin/attendance/list', fn() => view('admin.daily'))->name('admin.daily');
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        // 日次勤怠一覧
+        Route::get('/attendance/list', [AdminConfirmController::class, 'daily'])->name('daily');
+    });
 
 // ログアウト（共通）
 Route::post('/logout', LogoutController::class)->name('logout');
