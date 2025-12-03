@@ -6,12 +6,12 @@
 
 /* タイトル全体 */
 .page-title {
-    font-size: 30px;
+    font-size: 28px;
     font-weight: bold;
     margin-bottom: 40px;
     display: flex;
     align-items: center;
-    padding-left: 20px;   /* ← 線の分の余白 */
+    padding-left: 20px; /* ← 線の分の余白 */
     position: relative;
 }
 
@@ -22,8 +22,8 @@
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    width: 7px;          /* ★ 太さ */
-    height: 40px;        /* ★ 長さ */
+    width: 7px; /* ★ 太さ */
+    height: 36px; /* ★ 長さ */
     background-color: #000;
     border-radius: 2px;
 }
@@ -38,7 +38,7 @@
 }
 
 .month-display {
-    font-size: 24px;    /* ★ 文字を大きく */
+    font-size: 24px; /* ★ 文字を大きく */
     font-weight: bold; /* ★ 太字にする */
 }
 
@@ -61,7 +61,7 @@
 .attendance-table th,
 .attendance-table td {
     text-align: center;
-    padding: 2px;  /* ← ヘッダはそのまま */
+    padding: 2px; /* ← ヘッダはそのまま */
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
     border-left: none;
@@ -72,16 +72,16 @@
 .attendance-table thead th {
     font-size: 18px;
     font-weight: normal;
-    letter-spacing: 0.2em;  /* ★ 文字同士の間隔を広げる */
+    letter-spacing: 0.2em; /* ★ 文字同士の間隔を広げる */
 }
 
 .attendance-table tbody td {
     font-size: 18px;
-    padding: 8px 8px;   /* ★ 上下を 8px → 4px に */
-    line-height: 1.2;  /* ★ 文字の縦幅も少し詰める */
-    min-height: 46px;     /* ★ これを追加：行の最低高さを固定 */
-    height: 46px;         /* ★ min-height だけだと効かないブラウザ対策 */
-    letter-spacing: 0.2em;  /* ★ データの文字間隔 */
+    padding: 8px 8px; /* ★ 上下を 8px → 4px に */
+    line-height: 1.2; /* ★ 文字の縦幅も少し詰める */
+    min-height: 46px; /* ★ これを追加：行の最低高さを固定 */
+    height: 46px; /* ★ min-height だけだと効かないブラウザ対策 */
+    letter-spacing: 0.2em; /* ★ データの文字間隔 */
 }
 
 /*  詳細ボタン  */
@@ -97,7 +97,7 @@
 
 /* ===== 詳細ボタン：無効（未来日用） ===== */
 .btn-disabled {
-    color: #888;              /* 文字を薄く */
+    color: #888; /* 文字を薄く */
     opacity: 0.8;
 }
 

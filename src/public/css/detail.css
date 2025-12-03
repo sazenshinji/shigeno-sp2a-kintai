@@ -1,0 +1,179 @@
+/* タイトル全体 */
+.page-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    padding-left: 20px; /* ← 線の分の余白 */
+    position: relative;
+}
+
+/* 本物の縦線を描画 */
+.page-title::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 7px; /* ★ 太さ */
+    height: 36px; /* ★ 長さ */
+    background-color: #000;
+    border-radius: 2px;
+}
+
+.attendance-list-wrapper {
+    width: 60%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+.attendance-table th,
+.attendance-table td {
+    border-bottom: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+}
+/* ラベル（th）だけを中央寄りにする */
+.attendance-table th {
+    padding-left: 50px;
+    font-weight: normal;
+    width: 180px;
+    font-size: 14px; /* ラベル文字を小さくする */
+    letter-spacing: 0.2em; /* 文字間隔を少し広げる */
+}
+.attendance-table td {
+    padding-left: 140px;
+    font-weight: bold;
+    letter-spacing: 0.2em; /* 文字間隔を少し広げる */
+}
+
+/* ===============================
+   日付「YYYY年」と「M月」の間隔調整
+================================ */
+
+.date-year {
+    margin-right: 93px;
+}
+
+/* 任意：月と日の間も少し空けたい場合 */
+.date-month {
+    margin-right: 8px;
+}
+
+/* ===============================
+   時刻「～」の左右間隔を広げる
+================================ */
+.time-separator {
+    display: inline-block;
+    margin: 0 40px; /* ★ ここが間隔（15px～30pxで調整） */
+    font-weight: bold;
+}
+
+/* ===== 行の高さ調整 ===== */
+
+/* 「名前」行だけ（1.5倍） */
+.attendance-table tbody tr:first-child th,
+.attendance-table tbody tr:first-child td {
+    padding-top: 15px; /* 10px → 15px（1.5倍） */
+    padding-bottom: 15px;
+}
+
+/* 「日付」～「備考」まで（2倍） */
+.attendance-table tbody tr:not(:first-child) th,
+.attendance-table tbody tr:not(:first-child) td {
+    padding-top: 20px; /* 10px → 20px（2倍） */
+    padding-bottom: 20px;
+}
+
+/* ===============================
+   休憩２：時間選択ツールを非表示
+================================ */
+
+/* Chrome / Edge / Safari */
+.no-time-picker::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+}
+
+/* Firefox */
+.no-time-picker {
+    appearance: none;
+    -moz-appearance: textfield;
+}
+
+/* ===============================
+   休憩２：入力欄の枠を薄いグレーにする
+================================ */
+
+.no-time-picker {
+    border: 1px solid #ccc; /* 枠を薄いグレーに */
+    border-radius: 4px; /* 角を少し丸く（任意） */
+    padding: 4px 6px; /* 内側余白を調整 */
+    outline: none; /* クリック時の濃い枠を消す */
+    box-shadow: none; /* Chromeの青い影を消す */
+}
+
+/* フォーカス時も薄いグレーのままにする */
+.no-time-picker:focus {
+    border: 1px solid #aaa; /* 少しだけ濃く */
+    box-shadow: none;
+}
+
+/* ===============================
+   備考：入力欄を縦・横ともに大きくする
+================================ */
+
+.attendance-table textarea {
+    width: 56%;        /* ★ 横幅を拡大（70%〜90%で調整可能） */
+    min-height: 60px; /* ★ 縦を大きく（今より約2.5倍） */
+    padding: 10px;     /* ★ 内側余白を大きくして入力しやすく */
+    font-size: 15px;  /* ★ 文字も少し見やすく */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical; /* ★ 縦方向だけ手動リサイズ可能 */
+    box-sizing: border-box;
+}
+
+
+
+.detail-footer {
+    margin-top: 30px;
+    text-align: right;
+}
+
+.btn-edit,
+.btn-delete {
+    background-color: #000;   /* 黒地 */
+    color: #fff;              /* 白文字 */
+    border: none;             /* 枠なし */
+    font-size: 18px;          /* ★ 文字を大きく */
+    padding: 12px 26px;       /* ★ ボタン自体も大きく */
+    margin-left: 14px;
+    border-radius: 6px;       /* 少し角丸 */
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* ホバー時：少しだけ薄く */
+.btn-edit:hover,
+.btn-delete:hover {
+    background-color: #333;
+}
+
+/* 押したときの演出 */
+.btn-edit:active,
+.btn-delete:active {
+    transform: scale(0.97);
+}
+
+.pending-message {
+    color: #c00;
+    font-weight: bold;
+}

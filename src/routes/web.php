@@ -28,8 +28,12 @@ Route::middleware(['auth', 'verified'])
         Route::post('/break-in', [UserAttendanceController::class, 'breakIn'])->name('attendance.breakIn');
         Route::post('/break-out', [UserAttendanceController::class, 'breakOut'])->name('attendance.breakOut');
 
-    // 月次勤怠一覧表示
-    Route::get('/list', [DisplayController::class, 'monthly'])->name('attendance.list');
+        // 月次勤怠一覧表示
+        Route::get('/list', [DisplayController::class, 'monthly'])->name('attendance.list');
+
+    // 勤怠詳細画面（一般ユーザー）
+    Route::get('/detail/{date}', [DisplayController::class, 'detail'])
+        ->name('attendance.detail');
     });
 
 // 管理者専用ページ

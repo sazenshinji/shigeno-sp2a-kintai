@@ -37,24 +37,30 @@ class Attendance extends Model
         'clock_out',
     ];
 
+    // ユーザー
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // 休憩を別テーブルで管理する場合の関連（breaktimes テーブルがある前提）
+    // 休憩（既存）
     public function breaktimes()
     {
         return $this->hasMany(Breaktime::class);
     }
 
-    // ラベル取得用アクセサ（blade から $attendance->status_label で参照可能）
+    // 修正申請
+    public function corrections()
+    {
+        return $this->hasMany(Correction::class);
+    }
+
+    // ステータスラベル
     public function getStatusLabelAttribute(): string
     {
         return self::STATUS_LABELS[$this->status] ?? '不明';
     }
 
-    
     // 休憩合計（分）
     public function getBreakTotalMinutesAttribute()
     {
@@ -74,10 +80,9 @@ class Attendance extends Model
             ->diffInMinutes(Carbon::parse($this->clock_out));
     }
 
-    // 実働時間（勤務−休憩）
+    // 実働時間（勤務 − 休憩）
     public function getTotalWorkingMinutesAttribute()
     {
         return max(0, $this->work_total_minutes - $this->break_total_minutes);
     }
-
 }

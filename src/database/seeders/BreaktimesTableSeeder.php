@@ -234,6 +234,36 @@ class BreaktimesTableSeeder extends Seeder
             'updated_at' => now(),
         ];
         DB::table('breaktimes')->insert($param);
+        $param = [
+            'attendance_id' => 35,
+            'break_index'     => 2,
+            'break_start'   => Carbon::create(2025, 12, 2, 10, 00, 0),
+            'break_end'     => Carbon::create(2025, 12, 2, 10, 15, 0),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+        DB::table('breaktimes')->insert($param);
+        $param = [
+            'attendance_id' => 35,
+            'break_index'     => 3,
+            'break_start'   => Carbon::create(2025, 12, 2, 15, 00, 0),
+            'break_end'     => Carbon::create(2025, 12, 2, 15, 15, 0),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+        DB::table('breaktimes')->insert($param);
+        $param = [
+            'attendance_id' => 35,
+            'break_index'     => 4,
+            'break_start'   => Carbon::create(2025, 12, 2, 9, 30, 0),
+            'break_end'     => Carbon::create(2025, 12, 2, 9, 45, 0),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+        DB::table('breaktimes')->insert($param);
+
+
+
 
         //----2025年12月3日(水)----
         $param = [

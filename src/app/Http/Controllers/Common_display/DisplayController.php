@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Models\Correction;
 
 class DisplayController extends Controller
 {
@@ -52,4 +53,30 @@ class DisplayController extends Controller
             'today'      => $today,
         ]);
     }
+
+    public function detail(Request $request)
+    {
+        $user = Auth::user();
+        $date = Carbon::parse($request->date);
+
+        // 勤怠があれば取得、無ければ null
+        $attendance = Attendance::with('breaktimes')
+            ->where('user_id', $user->id)
+            ->where('work_date', $date->format('Y-m-d'))
+            ->first();
+
+        $breaks = $attendance?->breaktimes()->orderBy('break_start')->get() ?? collect();
+
+        // 承認待ち判定（今は仮）
+        $isPending = false;
+
+        return view('common_display.detail', compact(
+            'user',
+            'date',
+            'attendance',
+            'breaks',
+            'isPending'
+        ));
+    }
+
 }

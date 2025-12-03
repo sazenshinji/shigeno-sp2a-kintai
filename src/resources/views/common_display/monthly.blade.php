@@ -94,13 +94,19 @@
                 {{-- 詳細 --}}
                 <td>
                     @if($isFuture)
-                    {{-- 未来日は 押せないグレー表示 --}}
+                    {{-- 未来日は 押せない --}}
                     <button class="btn-detail btn-disabled" disabled>詳細</button>
+
                     @else
-                    {{-- 今日以前は 通常表示 --}}
-                    <button class="btn-detail">詳細</button>
+                    {{-- 本日以前は「勤怠あり・なし」に関係なく押せる --}}
+                    <a href="{{ route('attendance.detail', [
+                        'date' => $date->format('Y-m-d')
+                    ]) }}">
+                        <button class="btn-detail">詳細</button>
+                    </a>
                     @endif
                 </td>
+
             </tr>
 
             @endforeach
