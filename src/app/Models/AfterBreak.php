@@ -10,7 +10,7 @@ class AfterBreak extends Model
     use HasFactory;
 
     protected $fillable = [
-        'aftercorrection_id',
+        'after_correction_id',
         'break_index',
         'after_break_start',
         'after_break_end',

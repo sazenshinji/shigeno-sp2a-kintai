@@ -19,6 +19,7 @@ Route::middleware('guest')->get('/admin/login', function () {
 Route::middleware(['auth', 'verified'])
     ->prefix('attendance')
     ->group(function () {
+
         // 勤怠ホーム（打刻画面）
         Route::get('/', [UserAttendanceController::class, 'index'])->name('attendance');
 
@@ -31,9 +32,17 @@ Route::middleware(['auth', 'verified'])
         // 月次勤怠一覧表示
         Route::get('/list', [DisplayController::class, 'monthly'])->name('attendance.list');
 
-    // 勤怠詳細画面（一般ユーザー）
-    Route::get('/detail/{date}', [DisplayController::class, 'detail'])
-        ->name('attendance.detail');
+        // 勤怠詳細画面（一般ユーザー）
+        Route::get('/detail/{date}', [DisplayController::class, 'detail'])
+            ->name('attendance.detail');
+
+        // 【追加】修正申請（POST）
+        Route::post('/detail/update', [DisplayController::class, 'update'])
+            ->name('attendance.detail.update');
+
+        // 【追加】削除申請（POST）
+        Route::post('/detail/delete', [DisplayController::class, 'delete'])
+            ->name('attendance.detail.delete');
     });
 
 // 管理者専用ページ
@@ -41,8 +50,10 @@ Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
+
         // 日次勤怠一覧
-        Route::get('/attendance/list', [AdminConfirmController::class, 'daily'])->name('daily');
+        Route::get('/attendance/list', [AdminConfirmController::class, 'daily'])
+            ->name('daily');
     });
 
 // ログアウト（共通）

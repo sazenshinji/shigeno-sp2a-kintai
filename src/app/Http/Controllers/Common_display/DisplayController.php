@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\Correction;
+use App\Models\AfterCorrection;
+use App\Models\AfterBreak;
 
 class DisplayController extends Controller
 {
@@ -24,7 +26,6 @@ class DisplayController extends Controller
         $end   = $current->copy()->endOfMonth();
         $today = Carbon::today();
 
-        // 月の勤怠を work_date をキーにコレクション化
         $attendanceMap = Attendance::with('breaktimes')
             ->where('user_id', $user->id)
             ->whereBetween('work_date', [$start, $end])
@@ -33,7 +34,6 @@ class DisplayController extends Controller
                 return Carbon::parse($item->work_date)->format('Y-m-d');
             });
 
-        //月初〜月末まで全日生成
         $dates = [];
         $date = $start->copy();
         while ($date <= $end) {
@@ -54,21 +54,30 @@ class DisplayController extends Controller
         ]);
     }
 
+    /**
+     * 勤怠詳細表示
+     */
     public function detail(Request $request)
     {
         $user = Auth::user();
         $date = Carbon::parse($request->date);
 
-        // 勤怠があれば取得、無ければ null
         $attendance = Attendance::with('breaktimes')
             ->where('user_id', $user->id)
             ->where('work_date', $date->format('Y-m-d'))
             ->first();
 
-        $breaks = $attendance?->breaktimes()->orderBy('break_start')->get() ?? collect();
+        $breaks = $attendance
+            ? $attendance->breaktimes()->orderBy('break_start')->get()
+            : collect();
 
-        // 承認待ち判定（今は仮）
-        $isPending = false;
+        // ★ 承認待ちチェック
+        $isPending = Correction::where('target_user_id', $user->id)
+            ->where('status', 0)
+            ->whereHas('aftercorrection', function ($q) use ($date) {
+                $q->whereDate('after_work_date', $date->format('Y-m-d'));
+            })
+            ->exists();
 
         return view('common_display.detail', compact(
             'user',
@@ -79,4 +88,99 @@ class DisplayController extends Controller
         ));
     }
 
+    /**
+     * 修正申請
+     */
+    public function update(Request $request)
+    {
+        $user = Auth::user();
+        $date = Carbon::parse($request->input('date'));
+        $action = $request->input('action'); // edit / delete
+
+        $attendance = Attendance::with('breaktimes')
+            ->where('user_id', $user->id)
+            ->where('work_date', $date->format('Y-m-d'))
+            ->first();
+
+        // 二重申請防止
+        $alreadyPending = Correction::where('target_user_id', $user->id)
+            ->where('status', 0)
+            ->whereHas('aftercorrection', function ($q) use ($date) {
+                $q->whereDate('after_work_date', $date->format('Y-m-d'));
+            })
+            ->exists();
+
+        if ($alreadyPending) {
+            return back()->with('error', '承認待ちの申請があるため修正できません。');
+        }
+
+        // 種別判定
+        if (!$attendance) {
+            $type = 0; // 新規
+        } elseif ($action === 'delete') {
+            $type = 2; // 削除
+        } else {
+            $type = 1; // 修正
+        }
+
+        // corrections
+        $correction = Correction::create([
+            'operate_user_id' => $user->id,
+            'target_user_id'  => $user->id,
+            'attendance_id'   => $attendance?->id,
+            'type'            => $type,
+            'reason'          => $request->input('reason', ''),
+            'status'          => 0,
+            'approved_at'     => null,
+        ]);
+
+        $workDate = $date->format('Y-m-d');
+
+        // aftercorrections
+        $clockIn  = $request->input('clock_in');
+        $clockOut = $request->input('clock_out');
+
+        $afterCorrection = AfterCorrection::create([
+            'correction_id'   => $correction->id,
+            'after_work_date' => $workDate,
+            'after_clock_in'  => $clockIn  ? Carbon::createFromFormat('Y-m-d H:i', $workDate . ' ' . $clockIn)  : null,
+            'after_clock_out' => $clockOut ? Carbon::createFromFormat('Y-m-d H:i', $workDate . ' ' . $clockOut) : null,
+        ]);
+
+        // afterbreaks
+        $allBreaks = [];
+
+        foreach ($request->input('breaks', []) as $row) {
+            if (!empty($row['start']) && !empty($row['end'])) {
+                $allBreaks[] = $row;
+            }
+        }
+
+        $extra = $request->input('extra_break', []);
+        if (!empty($extra['start']) && !empty($extra['end'])) {
+            $allBreaks[] = $extra;
+        }
+
+        foreach ($allBreaks as $index => $row) {
+            AfterBreak::create([
+                'after_correction_id' => $afterCorrection->id,
+                'break_index'        => $index + 1,
+                'after_break_start' => Carbon::createFromFormat('Y-m-d H:i', $workDate . ' ' . $row['start']),
+                'after_break_end'   => Carbon::createFromFormat('Y-m-d H:i', $workDate . ' ' . $row['end']),
+            ]);
+        }
+
+        return redirect()
+            ->route('attendance.list', ['month' => $date->format('Y-m')])
+            ->with('success', '修正申請を登録しました。');
+    }
+
+    /**
+     * 削除申請（削除ボタン用）
+     */
+    public function delete(Request $request)
+    {
+        $request->merge(['action' => 'delete']);
+        return $this->update($request);
+    }
 }

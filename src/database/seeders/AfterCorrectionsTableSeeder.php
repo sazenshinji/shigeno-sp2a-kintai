@@ -18,7 +18,7 @@ class AfterCorrectionsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('aftercorrections')->insert($param);
+        DB::table('after_corrections')->insert($param);
         $param = [
             'correction_id' => 2,
             'after_work_date'  => '2025-11-8',
@@ -27,7 +27,7 @@ class AfterCorrectionsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('aftercorrections')->insert($param);
+        DB::table('after_corrections')->insert($param);
         $param = [
             'correction_id' => 4,
             'after_work_date'  => '2025-12-2',
@@ -36,6 +36,6 @@ class AfterCorrectionsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('aftercorrections')->insert($param);
+        DB::table('after_corrections')->insert($param);
     }
 }

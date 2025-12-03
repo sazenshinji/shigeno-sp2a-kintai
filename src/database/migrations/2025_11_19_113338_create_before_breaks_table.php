@@ -8,20 +8,20 @@ class CreateBeforeBreaksTable extends Migration
 {
     public function up()
     {
-        Schema::create('beforebreaks', function (Blueprint $table) {
+        Schema::create('before_breaks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('beforecorrection_id')->constrained('beforecorrections')->cascadeOnDelete();
+            $table->foreignId('before_correction_id')->constrained('before_corrections')->cascadeOnDelete();
             $table->tinyInteger('break_index');
             $table->dateTime('before_break_start');
             $table->dateTime('before_break_end')->nullable();
             $table->timestamps();
 
-            $table->unique(['beforecorrection_id', 'break_index']);
+            $table->unique(['before_correction_id', 'break_index']);
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('beforebreaks');
+        Schema::dropIfExists('before_breaks');
     }
 }

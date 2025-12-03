@@ -5,7 +5,7 @@
     margin-bottom: 40px;
     display: flex;
     align-items: center;
-    padding-left: 20px; /* ← 線の分の余白 */
+    padding-left: 24px; /* ← 線の分の余白 */
     position: relative;
 }
 
@@ -32,6 +32,8 @@
     width: 100%;
     border-collapse: collapse;
     background: #fff;
+    border-radius: 10px; /* ★ 四隅を丸くする */
+    overflow: hidden;
 }
 
 .attendance-table th,
@@ -45,7 +47,7 @@
     padding-left: 50px;
     font-weight: normal;
     width: 180px;
-    font-size: 14px; /* ラベル文字を小さくする */
+    font-size: 16px; /* ラベル文字 */
     letter-spacing: 0.2em; /* 文字間隔を少し広げる */
 }
 .attendance-table td {
@@ -54,19 +56,30 @@
     letter-spacing: 0.2em; /* 文字間隔を少し広げる */
 }
 
+/* === 名前・日付のデータだけをさらに右へ移動 === */
+.attendance-table tbody tr:nth-child(1) td,
+.attendance-table tbody tr:nth-child(2) td {
+    padding-left: 160px; /* ← 今の140px → 200px に強化 */
+}
+
 /* ===============================
    日付「YYYY年」と「M月」の間隔調整
 ================================ */
 
 .date-year {
     margin-right: 93px;
+    font-size: 16px;
 }
 
 /* 任意：月と日の間も少し空けたい場合 */
 .date-month {
     margin-right: 8px;
+    font-size: 16px;
 }
 
+.date-day {
+    font-size: 16px;
+}
 /* ===============================
    時刻「～」の左右間隔を広げる
 ================================ */
@@ -81,15 +94,15 @@
 /* 「名前」行だけ（1.5倍） */
 .attendance-table tbody tr:first-child th,
 .attendance-table tbody tr:first-child td {
-    padding-top: 15px; /* 10px → 15px（1.5倍） */
-    padding-bottom: 15px;
+    padding-top: 26px;
+    padding-bottom: 26px;
 }
 
 /* 「日付」～「備考」まで（2倍） */
 .attendance-table tbody tr:not(:first-child) th,
 .attendance-table tbody tr:not(:first-child) td {
-    padding-top: 20px; /* 10px → 20px（2倍） */
-    padding-bottom: 20px;
+    padding-top: 30px;
+    padding-bottom: 30px;
 }
 
 /* ===============================
@@ -127,21 +140,38 @@
 }
 
 /* ===============================
+   時刻入力エリアを大きくする
+================================ */
+
+.attendance-table input[type="time"] {
+    font-size: 16px; /* ← 日付と同じ */
+    font-weight: bold; /* ← 日付右側（td）の太さと同じ */
+    letter-spacing: 0.2em; /* ← 日付と完全一致 */
+    font-family: inherit; /* ← 日付とフォント完全共通化 */
+
+    padding: 10px 10px;
+    min-width: 120px;
+    height: 32px;
+    line-height: 32px;
+    box-sizing: border-box;
+
+    text-align: center;
+}
+
+/* ===============================
    備考：入力欄を縦・横ともに大きくする
 ================================ */
 
 .attendance-table textarea {
-    width: 56%;        /* ★ 横幅を拡大（70%〜90%で調整可能） */
+    width: 56%; /* ★ 横幅を拡大（70%〜90%で調整可能） */
     min-height: 60px; /* ★ 縦を大きく（今より約2.5倍） */
-    padding: 10px;     /* ★ 内側余白を大きくして入力しやすく */
-    font-size: 15px;  /* ★ 文字も少し見やすく */
+    padding: 10px; /* ★ 内側余白を大きくして入力しやすく */
+    font-size: 15px; /* ★ 文字も少し見やすく */
     border: 1px solid #ccc;
     border-radius: 4px;
     resize: vertical; /* ★ 縦方向だけ手動リサイズ可能 */
     box-sizing: border-box;
 }
-
-
 
 .detail-footer {
     margin-top: 30px;
@@ -153,12 +183,18 @@
     background-color: #000;   /* 黒地 */
     color: #fff;              /* 白文字 */
     border: none;             /* 枠なし */
-    font-size: 18px;          /* ★ 文字を大きく */
-    padding: 12px 26px;       /* ★ ボタン自体も大きく */
-    margin-left: 14px;
-    border-radius: 6px;       /* 少し角丸 */
-    cursor: pointer;
+
+    font-size: 22px;          /* 文字サイズは維持 */
     font-weight: bold;
+
+    padding: 10px 48px;       /* ✅ 縦を低く・横を広く */
+    height: 52px;             /* ✅ 高さを少し低めに固定 */
+    line-height: 26px;        /* ✅ 文字の上下中央揃え */
+
+    margin-left: 20px;
+    border-radius: 6px;
+
+    cursor: pointer;
 }
 
 /* ホバー時：少しだけ薄く */

@@ -10,7 +10,7 @@ class BeforeBreak extends Model
     use HasFactory;
 
     protected $fillable = [
-        'beforecorrection_id',
+        'before_correction_id',
         'break_index',
         'before_break_start',
         'before_break_end',

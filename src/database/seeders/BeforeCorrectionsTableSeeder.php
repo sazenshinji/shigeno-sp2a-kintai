@@ -29,6 +29,6 @@ class BeforeCorrectionsTableSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
-        DB::table('beforecorrections')->insert($param);
+        DB::table('before_corrections')->insert($param);
     }
 }

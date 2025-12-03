@@ -8,7 +8,7 @@ class CreateAfterCorrectionsTable extends Migration
 {
     public function up()
     {
-        Schema::create('aftercorrections', function (Blueprint $table) {
+        Schema::create('after_corrections', function (Blueprint $table) {
             $table->id();
             $table->foreignId('correction_id')->constrained('corrections')->cascadeOnDelete();
             $table->date('after_work_date');
@@ -23,6 +23,6 @@ class CreateAfterCorrectionsTable extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('aftercorrections');
+        Schema::dropIfExists('after_corrections');
     }
 }
