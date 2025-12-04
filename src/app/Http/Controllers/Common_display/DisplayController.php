@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Models\Correction;
 use App\Models\AfterCorrection;
 use App\Models\AfterBreak;
+use App\Models\User;
 
 class DisplayController extends Controller
 {
@@ -182,5 +183,31 @@ class DisplayController extends Controller
     {
         $request->merge(['action' => 'delete']);
         return $this->update($request);
+    }
+
+    public function adminDetail($userId, $date)
+    {
+        $user = User::findOrFail($userId);
+        $date = Carbon::parse($date);
+
+        $attendance = Attendance::with('breaktimes')
+            ->where('user_id', $user->id)
+            ->where('work_date', $date->format('Y-m-d'))
+            ->first();
+
+        $breaks = $attendance
+            ? $attendance->breaktimes()->orderBy('break_start')->get()
+            : collect();
+
+        // 管理者は常に編集不可
+        $isPending = true;
+
+        return view('common_display.detail', compact(
+            'user',
+            'date',
+            'attendance',
+            'breaks',
+            'isPending'
+        ));
     }
 }

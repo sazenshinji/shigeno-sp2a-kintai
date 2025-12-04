@@ -14,14 +14,14 @@ body {
     font-weight: bold;
 }
 .logo-img {
-    height: 30px;
-    margin-top: 10px;
+    height: 44px;
+    margin-top: 6px;
 }
 
 .nav-menu ul {
     list-style: none;
     display: flex;
-    gap: 20px;
+    gap: 0px;
     align-items: center;
     margin-right: 20px;
 }
@@ -31,12 +31,13 @@ body {
 .logout-btn {
     color: #fff; /* 白文字 */
     background-color: #000; /* 黒背景 */
-    padding: 8px 14px;
-    border: none; /* ← 枠線削除 */
-    border-radius: 4px;
+    padding: 14px 32px; /* 縦と横を大きく */
+    border: none; /* 枠線なし */
+    border-radius: 8px; /* 少し丸く */
     font-weight: bold;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 22px; /* 文字を大きく */
+    letter-spacing: 0.05em; /* 文字間隔を少し詰める */
 }
 
 /* ホバー時 */

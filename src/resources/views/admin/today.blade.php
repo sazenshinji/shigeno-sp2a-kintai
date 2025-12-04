@@ -87,7 +87,14 @@
                     @if($isFuture)
                     <button class="btn-detail btn-disabled" disabled>詳細</button>
                     @else
-                    <button class="btn-detail">詳細</button>
+                    <a
+                        href="{{ route('admin.attendance.detail', [
+                            'user' => $user->id,
+                            'date' => $current->format('Y-m-d')
+                        ]) }}"
+                        class="btn-detail">
+                        詳細
+                    </a>
                     @endif
                 </td>
             </tr>

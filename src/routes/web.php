@@ -54,6 +54,10 @@ Route::middleware(['auth', 'admin'])
         // 日次勤怠一覧
         Route::get('/attendance/list', [AdminConfirmController::class, 'daily'])
             ->name('daily');
+
+        // 管理者用 勤怠詳細表示
+        Route::get('/attendance/{user}/{date}', [DisplayController::class, 'adminDetail'])
+            ->name('attendance.detail');
     });
 
 // ログアウト（共通）
