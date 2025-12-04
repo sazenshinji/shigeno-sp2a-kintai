@@ -19,18 +19,29 @@
   <header class="header">
 
     <div class="logo">
-      <a href="{{ url('/attendance') }}">
+      <a href="{{ route('admin.daily') }}">
         <img class="logo-img" src="{{ asset('images/Coachtech.jpg') }}" alt="勤怠">
       </a>
     </div>
 
     <nav class="nav-menu">
       <ul>
-        <li><a href="{{ url('/attendance') }}">勤怠一覧</a></li>
-        <li><a href="{{ url('/attendance/list') }}">スタッフ一覧</a></li>
-        <li><a href="{{ url('/attendance/request') }}">申請一覧</a></li>
+        {{-- ✅ 勤怠一覧（管理者用） --}}
+        <li>
+          <a href="{{ route('admin.daily') }}">勤怠一覧</a>
+        </li>
 
-        {{-- ログアウトフォーム --}}
+        {{-- ✅ スタッフ一覧（将来用：今は同じでOK） --}}
+        <li>
+          <a href="{{ route('admin.daily') }}">スタッフ一覧</a>
+        </li>
+
+        {{-- ✅ 申請一覧（将来ルート作成時に差し替え） --}}
+        <li>
+          <a href="#">申請一覧</a>
+        </li>
+
+        {{-- ログアウト --}}
         <li>
           <form action="{{ route('logout') }}" method="POST">
             @csrf
@@ -39,8 +50,6 @@
         </li>
       </ul>
     </nav>
-
-    </div>
 
   </header>
 

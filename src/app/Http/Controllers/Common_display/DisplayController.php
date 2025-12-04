@@ -11,6 +11,7 @@ use App\Models\Correction;
 use App\Models\AfterCorrection;
 use App\Models\AfterBreak;
 use App\Models\User;
+use App\Http\Requests\DetailRequest;
 
 class DisplayController extends Controller
 {
@@ -92,7 +93,7 @@ class DisplayController extends Controller
     /**
      * 修正申請
      */
-    public function update(Request $request)
+    public function update(DetailRequest $request)
     {
         $user = Auth::user();
         $date = Carbon::parse($request->input('date'));

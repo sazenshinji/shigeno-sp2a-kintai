@@ -213,3 +213,10 @@
     color: #c00;
     font-weight: bold;
 }
+
+/* 各項目の個別エラーメッセージ */
+.field-error {
+    color: #c00;
+    font-size: 14px;
+    margin-top: 6px;
+}
