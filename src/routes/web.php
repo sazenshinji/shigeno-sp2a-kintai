@@ -65,5 +65,13 @@ Route::middleware(['auth', 'admin'])
             ->name('attendance.detail');
     });
 
+// 申請詳細（承認画面）
+Route::middleware(['auth', 'verified'])
+    ->get(
+        '/stamp_correction_request/stamp_correction_request/approve/{id}',
+        [DisplayController::class, 'requestDetail']
+    )
+    ->name('request.detail');
+
 // ログアウト（共通）
 Route::post('/logout', LogoutController::class)->name('logout');

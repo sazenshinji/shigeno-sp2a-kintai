@@ -213,7 +213,7 @@ class DisplayController extends Controller
     }
 
     /**
-     * 申請一覧（ユーザー用）
+     * 申請一覧（ユーザー・管理者 共通）
      * /stamp_correction_request/list
      */
     public function requestList(Request $request)
@@ -226,20 +226,59 @@ class DisplayController extends Controller
             $tab = 'pending';
         }
 
-        // 対象ユーザーの申請を取得
-        $corrections = Correction::with('aftercorrection')
-            ->where('target_user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // ============================
+        // 管理者：全件
+        // ユーザー：自分の申請のみ
+        // ============================
+
+        $query = Correction::with(['afterCorrection', 'targetUser'])
+            ->orderBy('created_at', 'desc');
+
+        if ($user->role !== 1) {
+            // 一般ユーザー → 自分の申請のみ
+            $query->where('target_user_id', $user->id);
+        }
+
+        $corrections = $query->get();
 
         $pending  = $corrections->where('status', 0);
         $approved = $corrections->where('status', 1);
 
         return view('common_display.request_list', [
-            'user'     => $user,
-            'tab'      => $tab,
-            'pending'  => $pending,
-            'approved' => $approved,
+            'user'      => $user,
+            'tab'       => $tab,
+            'pending'   => $pending,
+            'approved'  => $approved,
+            'isAdmin'   => $user->role === 1,   // Blade 側で使う判定
+        ]);
+    }
+
+    /**
+     * 申請詳細表示
+     */
+    public function requestDetail($id)
+    {
+        $user = Auth::user();
+
+        // Model の正しいリレーション名に合わせて修正
+        $correction = Correction::with(['afterCorrection.afterBreaks'])
+            ->where('id', $id)
+            ->where('target_user_id', $user->id)
+            ->firstOrFail();
+
+        // camelCase に完全一致
+        $afterCorrection = $correction->afterCorrection;
+
+        $afterBreaks = $afterCorrection
+            ? $afterCorrection->afterBreaks()->orderBy('break_index')->get()
+            : collect();
+
+        return view('common_display.request_detail', [
+            'user'             => $user,
+            'correction'       => $correction,
+            'afterCorrection' => $afterCorrection,
+            'afterBreaks'      => $afterBreaks,
+            'isApproved'      => $correction->status === 1,
         ]);
     }
 }

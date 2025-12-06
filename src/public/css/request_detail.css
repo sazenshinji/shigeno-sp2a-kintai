@@ -1,0 +1,60 @@
+/* ===============================
+   日付「YYYY年」と「M月D日」の間隔調整（申請詳細用）
+================================ */
+
+.date-year {
+    margin-right: 85px;   /* 年 → 月日の間隔 */
+    font-size: 16px;
+}
+
+.date-month {
+    margin-right: 8px;     /* 月 → 日の間隔（微調整用） */
+    font-size: 16px;
+}
+
+.date-day {
+    font-size: 16px;
+}
+
+.pending-message {
+    color: #c00;
+    font-weight: bold;
+}
+
+.btn-edit {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    font-size: 22px;
+    font-weight: bold;
+    padding: 10px 48px;
+    height: 52px;
+    border-radius: 6px;
+}
+
+.btn-disabled {
+    background-color: #999 !important;
+    color: #eee !important;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ===============================
+   申請詳細：出勤・退勤／休憩／備考 の書き出し位置を右へ移動
+   （勤怠詳細の input 幅と視覚的に揃える）
+================================ */
+
+/* 出勤・退勤（3行目） */
+.attendance-table tbody tr:nth-child(3) td {
+    padding-left: 160px;   /* ← 今の140px → 200px に拡張 */
+}
+
+/* 休憩（4行目以降） */
+.attendance-table tbody tr:nth-child(n+4):not(:last-child) td {
+    padding-left: 160px;
+}
+
+/* 備考（最終行） */
+.attendance-table tbody tr:last-child td {
+    padding-left: 160px;
+}

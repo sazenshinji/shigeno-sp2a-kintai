@@ -1,4 +1,10 @@
-@extends('layouts.app')
+@php
+$layout = auth()->user()->role === 1
+? 'layouts.app_admin'
+: 'layouts.app';
+@endphp
+
+@extends($layout)
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('css/request.css') }}">
@@ -52,8 +58,14 @@
                 {{-- 状態 --}}
                 <td>{{ $statusLabel }}</td>
 
-                {{-- 名前（ログイン中ユーザー） --}}
-                <td>{{ $user->name }}</td>
+                {{-- 名前 --}}
+                <td>
+                    @if($isAdmin)
+                    {{ $correction->targetUser->name }}
+                    @else
+                    {{ $user->name }}
+                    @endif
+                </td>
 
                 {{-- 対象日時（after_corrections.after_work_date） --}}
                 <td>
@@ -74,7 +86,9 @@
 
                 {{-- 詳細ボタン（処理は後で実装） --}}
                 <td>
-                    <button class="btn-detail">詳細</button>
+                    <a href="{{ route('request.detail', ['id' => $correction->id]) }}">
+                        <button class="btn-detail">詳細</button>
+                    </a>
                 </td>
             </tr>
             @empty

@@ -52,4 +52,5 @@ class Correction extends Model
     {
         return $this->hasOne(BeforeCorrection::class);
     }
+    
 }
