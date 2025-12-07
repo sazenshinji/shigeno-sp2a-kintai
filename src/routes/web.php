@@ -45,8 +45,8 @@ Route::middleware(['auth', 'verified'])
             ->name('attendance.detail.delete');
     });
 
-//  申請一覧（一般ユーザー） 
-Route::middleware(['auth', 'verified'])
+// 申請一覧（ユーザー・管理者 共通）
+Route::middleware(['auth'])
     ->get('/stamp_correction_request/list', [DisplayController::class, 'requestList'])
     ->name('request.list');
 
@@ -65,13 +65,20 @@ Route::middleware(['auth', 'admin'])
             ->name('attendance.detail');
     });
 
-// 申請詳細（承認画面）
-Route::middleware(['auth', 'verified'])
+// 申請詳細（ユーザー・管理者 共通）
+Route::middleware(['auth'])
     ->get(
-        '/stamp_correction_request/stamp_correction_request/approve/{id}',
+        '/stamp_correction_request/approve/{id}',
         [DisplayController::class, 'requestDetail']
     )
     ->name('request.detail');
+
+// 管理者：申請承認処理
+Route::middleware(['auth', 'admin'])
+    ->post(
+        '/stamp_correction_request/approve/{id}',
+        [DisplayController::class, 'approve']
+    )->name('request.approve');
 
 // ログアウト（共通）
 Route::post('/logout', LogoutController::class)->name('logout');

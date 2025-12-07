@@ -12,6 +12,9 @@ use App\Models\AfterCorrection;
 use App\Models\AfterBreak;
 use App\Models\User;
 use App\Http\Requests\DetailRequest;
+use Illuminate\Support\Facades\DB;
+use App\Models\BeforeCorrection;
+use App\Models\BeforeBreak;
 
 class DisplayController extends Controller
 {
@@ -253,20 +256,19 @@ class DisplayController extends Controller
         ]);
     }
 
-    /**
-     * 申請詳細表示
-     */
     public function requestDetail($id)
     {
         $user = Auth::user();
 
-        // Model の正しいリレーション名に合わせて修正
-        $correction = Correction::with(['afterCorrection.afterBreaks'])
-            ->where('id', $id)
-            ->where('target_user_id', $user->id)
-            ->firstOrFail();
+        $query = Correction::with(['afterCorrection.afterBreaks', 'targetUser'])
+            ->where('id', $id);
 
-        // camelCase に完全一致
+        if ($user->role !== 1) {
+            $query->where('target_user_id', $user->id);
+        }
+
+        $correction = $query->firstOrFail();
+
         $afterCorrection = $correction->afterCorrection;
 
         $afterBreaks = $afterCorrection
@@ -278,7 +280,115 @@ class DisplayController extends Controller
             'correction'       => $correction,
             'afterCorrection' => $afterCorrection,
             'afterBreaks'      => $afterBreaks,
-            'isApproved'      => $correction->status === 1,
+            'isApproved'       => $correction->status === 1,
         ]);
+    }
+
+    /**
+     * 申請承認処理（管理者）
+     */
+    public function approve($id)
+    {
+        $correction = Correction::with([
+            'afterCorrection.afterBreaks'
+        ])->findOrFail($id);
+
+        // 二重承認防止
+        if ($correction->status === 1) {
+            return back()->with('error', 'すでに承認済みです。');
+        }
+
+        DB::transaction(function () use ($correction) {
+
+            $after = $correction->afterCorrection;
+            $afterBreaks = $after->afterBreaks;
+
+            // ==================================================
+            // ① 現在の勤怠を before_corrections に退避
+            // ==================================================
+
+            $attendance = Attendance::where('user_id', $correction->target_user_id)
+                ->where('work_date', $after->after_work_date)
+                ->first();
+
+            $beforeCorrection = BeforeCorrection::create([
+                'correction_id'     => $correction->id,
+                'before_work_date' => $attendance?->work_date,
+                'before_clock_in'  => $attendance?->clock_in,
+                'before_clock_out' => $attendance?->clock_out,
+            ]);
+
+            if ($attendance) {
+                foreach ($attendance->breaktimes as $b) {
+                    BeforeBreak::create([
+                        'before_correction_id' => $beforeCorrection->id,
+                        'break_index'          => $b->break_index,
+                        'before_break_start'  => $b->break_start,
+                        'before_break_end'    => $b->break_end,
+                    ]);
+                }
+            }
+
+            // ==================================================
+            // ② corrections.type に応じて反映
+            // ==================================================
+
+            // 0:新規追加
+            if ($correction->type === 0) {
+
+                $attendance = Attendance::create([
+                    'user_id'   => $correction->target_user_id,
+                    'work_date' => $after->after_work_date,
+                    'clock_in' => $after->after_clock_in,
+                    'clock_out' => $after->after_clock_out,
+                    'status'   => 3,
+                ]);
+
+                // 1:修正
+            } elseif ($correction->type === 1) {
+
+                $attendance->update([
+                    'clock_in'  => $after->after_clock_in,
+                    'clock_out' => $after->after_clock_out,
+                    'status'    => 3,
+                ]);
+
+                $attendance->breaktimes()->delete();
+
+                // 2:削除
+            } elseif ($correction->type === 2) {
+
+                $attendance?->delete();
+                $correction->update([
+                    'status' => 1,
+                    'approved_at' => now(),
+                ]);
+
+                return;
+            }
+
+            // ==================================================
+            // ③ breaktimes 再作成（新規・修正共通）
+            // ==================================================
+
+            foreach ($afterBreaks as $b) {
+                $attendance->breaktimes()->create([
+                    'break_index' => $b->break_index,
+                    'break_start' => $b->after_break_start,
+                    'break_end'   => $b->after_break_end,
+                ]);
+            }
+
+            // ==================================================
+            // ④ 承認確定
+            // ==================================================
+
+            $correction->update([
+                'status'      => 1,
+                'approved_at' => now(),
+            ]);
+        });
+
+        return back()->with('success', '申請を承認しました。');
     }
 }

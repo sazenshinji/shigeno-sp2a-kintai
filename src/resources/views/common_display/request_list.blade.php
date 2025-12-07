@@ -52,7 +52,7 @@ $layout = auth()->user()->role === 1
         <tbody>
             @forelse($list as $correction)
             @php
-            $after = $correction->aftercorrection;
+            $after = $correction->afterCorrection;
             @endphp
             <tr>
                 {{-- 状態 --}}

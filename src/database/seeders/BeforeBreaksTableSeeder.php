@@ -30,5 +30,9 @@ class BeforeBreaksTableSeeder extends Seeder
             'updated_at' => now(),
         ];
         DB::table('before_breaks')->insert($param);
+
+        //(2025年12月1日(月)渋野 日向子 【代理削除】)
+        //この日、休憩を取っていなかったためレコードはない。
+        
     }
 }

@@ -46,5 +46,35 @@ class AfterCorrectionsTableSeeder extends Seeder
             'updated_at' => now(),
         ];
         DB::table('after_corrections')->insert($param);
+
+        $param = [
+            'correction_id' => 5,
+            'after_work_date'  => '2025-11-28',
+            'after_clock_in'   => Carbon::create(2025, 11, 28, 9,30, 0),
+            'after_clock_out'  => Carbon::create(2025, 11, 28, 18, 30, 0),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+        DB::table('after_corrections')->insert($param);
+        $param = [
+            'correction_id' => 6,
+            'after_work_date'  => '2025-11-30',
+            'after_clock_in'   => Carbon::create(2025, 11, 30, 13, 0, 0),
+            'after_clock_out'  => Carbon::create(2025, 11, 30, 19, 30, 0),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+        DB::table('after_corrections')->insert($param);
+        $param = [
+            'correction_id' => 7,
+            'after_work_date'  => '2025-12-1',
+            'after_clock_in'   => Carbon::create(2025, 12, 1, 9, 0, 0),
+            'after_clock_out'  => Carbon::create(2025, 12, 1, 18, 0, 0),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+        DB::table('after_corrections')->insert($param);
+
+
     }
 }

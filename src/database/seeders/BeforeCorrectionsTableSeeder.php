@@ -19,13 +19,24 @@ class BeforeCorrectionsTableSeeder extends Seeder
         //----2025年12月1日(月)----
         //　承認待ちのためレコードはない。
 
-        
-        //----2025年12月2日(火)----
+
+        //----2025年12月2日(火) 大谷 翔平 【代理修正】----
         $param = [
             'correction_id'    => 4,
             'before_work_date'  => '2025-12-2',
             'before_clock_in'   => Carbon::create(2025, 12, 2, 9, 0, 0),
             'before_clock_out'  => Carbon::create(2025, 12, 2, 18, 0, 0),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+        DB::table('before_corrections')->insert($param);
+
+        //----12月1日(月)渋野 日向子 【代理削除】----
+        $param = [
+            'correction_id'    => 7,
+            'before_work_date'  => '2025-12-1',
+            'before_clock_in'   => Carbon::create(2025, 12, 1, 9, 0, 0),
+            'before_clock_out'  => Carbon::create(2025, 12, 1, 18, 0, 0),
             'created_at' => now(),
             'updated_at' => now(),
         ];

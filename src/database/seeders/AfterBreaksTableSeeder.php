@@ -52,7 +52,6 @@ class AfterBreaksTableSeeder extends Seeder
         ];
         DB::table('after_breaks')->insert($param);
 
-
         //----2025年12月2日(火) 大谷 翔平 【代理修正】----
         $param = [
             'after_correction_id' => 4,                              // FK
@@ -63,6 +62,32 @@ class AfterBreaksTableSeeder extends Seeder
             'updated_at' => now(),
         ];
         DB::table('after_breaks')->insert($param);
+
+        
+        //----2025年11月28日(金) 八村 塁 【修正】----
+        $param = [
+            'after_correction_id' => 5,                              // FK
+            'break_index' => 1,                                      // 休憩番号
+            'after_break_start'   => Carbon::create(2025, 11, 28, 12, 5, 0),
+            'after_break_end'     => Carbon::create(2025, 11, 28, 13, 6, 0),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+        DB::table('after_breaks')->insert($param);
+
+        //----11月30日(日) 石川 佳純 【追加】----
+        $param = [
+            'after_correction_id' => 6,                              // FK
+            'break_index' => 1,                                      // 休憩番号
+            'after_break_start'   => Carbon::create(2025, 11, 30, 12, 10, 0),
+            'after_break_end'     => Carbon::create(2025, 11, 30, 12, 40, 0),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+        DB::table('after_breaks')->insert($param);
+
+        //----2025年12月1日(月)渋野 日向子 【代理削除】)----
+        //----削除修正で、休憩入力しなかったためレコードはない。----
 
     }
 }

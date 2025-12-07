@@ -1,4 +1,10 @@
-@extends('layouts.app')
+@php
+$layout = auth()->user()->role === 1
+? 'layouts.app_admin'
+: 'layouts.app';
+@endphp
+
+@extends($layout)
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('css/detail.css') }}">
@@ -17,7 +23,7 @@
             {{-- 名前 --}}
             <tr>
                 <th>名前</th>
-                <td>{{ $user->name }}</td>
+                <td>{{ $correction->targetUser->name }}</td>
             </tr>
 
             {{-- 日付 --}}
@@ -39,7 +45,9 @@
             <tr>
                 <th>出勤・退勤</th>
                 <td>
+                    @if($afterCorrection && $afterCorrection->after_clock_in)
                     {{ \Carbon\Carbon::parse($afterCorrection->after_clock_in)->format('H:i') }}
+                    @endif
                     <span class="time-separator">～</span>
                     {{ \Carbon\Carbon::parse($afterCorrection->after_clock_out)->format('H:i') }}
                 </td>
@@ -68,13 +76,31 @@
 
     {{-- ===== 下部メッセージ・ボタン制御 ===== --}}
     <div class="detail-footer">
+        {{-- 管理者 ＋ 承認待ち → 承認ボタン表示 --}}
+        @if(auth()->user()->role === 1 && !$isApproved)
+        <form method="POST" action="{{ route('request.approve', $correction->id) }}">
+            @csrf
+            <button type="submit" class="btn-edit">
+                承認
+            </button>
+        </form>
 
-        @if(!$isApproved)
+        {{-- 管理者 ＋ 承認済み → 承認済みグレーボタン表示 --}}
+        @elseif(auth()->user()->role === 1 && $isApproved)
+        <button class="btn-edit btn-disabled">
+            承認済み
+        </button>
+
+        {{-- ユーザー ＋ 承認待ち → メッセージ表示 --}}
+        @elseif(auth()->user()->role !== 1 && !$isApproved)
         <p class="pending-message">
             ＊ 承認待ちのため修正はできません。
         </p>
-        @endif
 
+        {{-- 承認済みタブから来た場合（管理者・ユーザー共通）→ 何も出さない --}}
+        @else
+        {{-- 表示なし --}}
+        @endif
     </div>
 
 </div>
