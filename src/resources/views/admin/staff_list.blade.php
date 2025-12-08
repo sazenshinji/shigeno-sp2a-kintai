@@ -28,9 +28,10 @@
                 <td>{{ $user->email }}</td>
 
                 <td>
-                    <button class="detail-btn" disabled>
+                    {{-- ★ 管理者用 月次勤怠一覧へ --}}
+                    <a href="{{ route('admin.attendance.staff', ['id' => $user->id]) }}" class="detail-btn">
                         詳細
-                    </button>
+                    </a>
                 </td>
             </tr>
             @empty

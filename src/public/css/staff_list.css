@@ -67,10 +67,11 @@
 /* 詳細ボタン：枠なし・背景なし・太字 */
 .detail-btn {
     padding: 0;
-    border: none;             /* ★ 枠なし */
-    background: none;         /* ★ 背景なし */
-    font-weight: 700;         /* ★ 文字太め */
+    border: none;
+    background: none;
+    font-weight: 700;
     font-size: 15px;
     color: #333;
-    cursor: not-allowed;
+    cursor: pointer;   /* ★ not-allowed → pointer に */
+    text-decoration: none;
 }

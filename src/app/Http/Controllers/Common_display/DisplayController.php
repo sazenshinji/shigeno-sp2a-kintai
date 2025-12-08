@@ -528,4 +528,124 @@ class DisplayController extends Controller
             ->route('admin.daily', ['date' => $date->format('Y-m-d')])
             ->with('success', '管理者による即時反映が完了しました。');
     }
+
+    /**
+     * 月次勤怠一覧（管理者によるスタッフ閲覧用）
+     * /admin/attendance/staff/{id}?month=YYYY-MM
+     */
+    public function adminMonthly(Request $request, $id)
+    {
+        // 対象スタッフ
+        $targetUser = User::findOrFail($id);
+
+        // ?month=YYYY-MM（なければ今月）
+        $month = $request->query('month');
+        $current = $month ? Carbon::parse($month) : Carbon::now();
+
+        $start = $current->copy()->startOfMonth();
+        $end   = $current->copy()->endOfMonth();
+        $today = Carbon::today();
+
+        // 対象ユーザーの月次勤怠
+        $attendanceMap = Attendance::with('breaktimes')
+            ->where('user_id', $targetUser->id)
+            ->whereBetween('work_date', [$start, $end])
+            ->get()
+            ->keyBy(function ($item) {
+                return Carbon::parse($item->work_date)->format('Y-m-d');
+            });
+
+        // 1ヶ月分の日付配列
+        $dates = [];
+        $date = $start->copy();
+        while ($date <= $end) {
+            $key = $date->format('Y-m-d');
+            $dates[] = [
+                'date'       => $date->copy(),
+                'attendance' => $attendanceMap[$key] ?? null,
+            ];
+            $date->addDay();
+        }
+
+        return view('common_display.monthly', [
+            'dates'      => $dates,
+            'current'    => $current,
+            'prevMonth'  => $current->copy()->subMonth()->format('Y-m'),
+            'nextMonth'  => $current->copy()->addMonth()->format('Y-m'),
+            'today'      => $today,
+
+            // ★ 管理者用表示のための追加情報
+            'targetUser' => $targetUser,   // タイトル用（XXさんの勤怠）
+        ]);
+    }
+
+    /**
+     * 管理者用：スタッフ月次勤怠 CSV 出力
+     * /admin/attendance/staff/{id}/csv?month=YYYY-MM
+     */
+    public function adminMonthlyCsv(Request $request, $id)
+    {
+        $targetUser = User::findOrFail($id);
+
+        // 対象月（なければ今月）
+        $month = $request->query('month');
+        $current = $month ? Carbon::parse($month) : Carbon::now();
+
+        $start = $current->copy()->startOfMonth();
+        $end   = $current->copy()->endOfMonth();
+
+        // 勤怠データ取得
+        $attendances = Attendance::with('breaktimes')
+            ->where('user_id', $targetUser->id)
+            ->whereBetween('work_date', [$start, $end])
+            ->orderBy('work_date')
+            ->get();
+
+        // CSVヘッダー
+        $csvHeader = [
+            '日付',
+            '出勤',
+            '退勤',
+            '休憩(分)',
+            '合計労働時間(分)',
+        ];
+
+        $csvData = [];
+        $csvData[] = $csvHeader;
+
+        foreach ($attendances as $attendance) {
+            $csvData[] = [
+                Carbon::parse($attendance->work_date)->format('Y-m-d'),
+                $attendance->clock_in ? Carbon::parse($attendance->clock_in)->format('H:i') : '',
+                $attendance->clock_out ? Carbon::parse($attendance->clock_out)->format('H:i') : '',
+                $attendance->break_total_minutes ?? 0,
+                $attendance->total_working_minutes ?? 0,
+            ];
+        }
+
+        // ファイル名
+        $fileName = $targetUser->name . '_勤怠_' . $current->format('Y_m') . '.csv';
+
+        // CSVレスポンス生成
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename={$fileName}",
+        ];
+
+        $callback = function () use ($csvData) {
+            $stream = fopen('php://output', 'w');
+
+            // 文字化け防止（Excel用）
+            fwrite($stream, "\xEF\xBB\xBF");
+
+            foreach ($csvData as $row) {
+                fputcsv($stream, $row);
+            }
+
+            fclose($stream);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
 }

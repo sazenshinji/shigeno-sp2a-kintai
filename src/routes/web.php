@@ -67,6 +67,13 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/staff/list', [AdminConfirmController::class, 'staffList'])
                 ->name('staff.list');
 
+            // スタッフの月次勤怠一覧（管理者用）
+            Route::get('/attendance/staff/{id}', [DisplayController::class, 'adminMonthly'])
+                ->name('attendance.staff');
+
+            Route::get('/attendance/staff/{id}/csv', [DisplayController::class, 'adminMonthlyCsv'])
+                ->name('attendance.staff.csv');
+
             Route::get('/attendance/{user}/{date}', [DisplayController::class, 'adminDetail'])
                 ->name('attendance.detail');
 

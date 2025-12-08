@@ -1,4 +1,10 @@
-@extends('layouts.app')
+@php
+$layout = auth()->user()->role === 1
+? 'layouts.app_admin'
+: 'layouts.app';
+@endphp
+
+@extends($layout)
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('css/monthly.css') }}">
@@ -8,17 +14,40 @@
 <div class="attendance-list-wrapper">
 
     <h1 class="page-title">
+        @if(auth()->user()->role === 1 && isset($targetUser))
+        {{ $targetUser->name }}さんの勤怠
+        @else
         勤怠一覧
+        @endif
     </h1>
 
+    @php
+    // 管理者がスタッフの勤怠を見ている場合
+    if(auth()->user()->role === 1 && isset($targetUser)) {
+    $baseRoute = 'admin.attendance.staff';
+    $routeParam = ['id' => $targetUser->id];
+    }
+    // 一般ユーザーが自分の勤怠を見ている場合
+    else {
+    $baseRoute = 'attendance.list';
+    $routeParam = [];
+    }
+    @endphp
+
     <div class="month-nav">
-        <a class="btn-month" href="{{ route('attendance.list', ['month' => $prevMonth]) }}">← 前月</a>
+        <a class="btn-month"
+            href="{{ route($baseRoute, array_merge($routeParam, ['month' => $prevMonth])) }}">
+            ← 前月
+        </a>
 
         <div class="month-display">
             📅 {{ $current->format('Y/m') }}
         </div>
 
-        <a class="btn-month" href="{{ route('attendance.list', ['month' => $nextMonth]) }}">翌月 →</a>
+        <a class="btn-month"
+            href="{{ route($baseRoute, array_merge($routeParam, ['month' => $nextMonth])) }}">
+            翌月 →
+        </a>
     </div>
 
     <table class="attendance-table">
@@ -96,14 +125,25 @@
                     @if($isFuture)
                     {{-- 未来日は 押せない --}}
                     <button class="btn-detail btn-disabled" disabled>詳細</button>
-
                     @else
-                    {{-- 本日以前は「勤怠あり・なし」に関係なく押せる --}}
-                    <a href="{{ route('attendance.detail', [
+
+                    @if(auth()->user()->role === 1 && isset($targetUser))
+                    {{-- 管理者がスタッフの勤怠を見ているとき --}}
+                    <a href="{{ route('admin.attendance.detail', [
+                        'user' => $targetUser->id,
                         'date' => $date->format('Y-m-d')
-                    ]) }}">
+                        ]) }}">
                         <button class="btn-detail">詳細</button>
                     </a>
+                    @else
+                    {{-- 一般ユーザーが自分の勤怠を見ているとき --}}
+                    <a href="{{ route('attendance.detail', [
+                        'date' => $date->format('Y-m-d')
+                        ]) }}">
+                        <button class="btn-detail">詳細</button>
+                    </a>
+                    @endif
+
                     @endif
                 </td>
 
@@ -113,6 +153,18 @@
 
         </tbody>
     </table>
+
+    {{-- ★ 管理者がスタッフの勤怠を見ている場合だけ CSV ボタンを表示 --}}
+    @if(auth()->user()->role === 1 && isset($targetUser))
+    <div class="csv-export-wrapper">
+        <a href="{{ route('admin.attendance.staff.csv', [
+            'id' => $targetUser->id,
+            'month' => $current->format('Y-m')
+               ]) }}" class="csv-btn">
+            CSV出力
+        </a>
+    </div>
+    @endif
 
 </div>
 @endsection
