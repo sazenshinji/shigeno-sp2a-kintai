@@ -47,4 +47,14 @@ class ConfirmController extends Controller
             'today'     => $today,
         ]);
     }
+
+    public function staffList()
+    {
+        // 一般ユーザーのみ取得（role = 0）
+        $users = User::where('role', 0)
+            ->orderBy('id', 'asc')
+            ->get();
+
+        return view('admin.staff_list', compact('users'));
+    }
 }

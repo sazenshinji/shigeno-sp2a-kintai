@@ -78,7 +78,8 @@ $layout = auth()->user()->role === 1
     <div class="detail-footer">
         {{-- 管理者 ＋ 承認待ち → 承認ボタン表示 --}}
         @if(auth()->user()->role === 1 && !$isApproved)
-        <form method="POST" action="{{ route('request.approve', $correction->id) }}">
+        <form method="POST"
+            action="{{ route('admin.request.approve', ['id' => $correction->id]) }}">
             @csrf
             <button type="submit" class="btn-edit">
                 承認
@@ -87,7 +88,7 @@ $layout = auth()->user()->role === 1
 
         {{-- 管理者 ＋ 承認済み → 承認済みグレーボタン表示 --}}
         @elseif(auth()->user()->role === 1 && $isApproved)
-        <button class="btn-edit btn-disabled">
+        <button class="btn-edit btn-disabled" disabled>
             承認済み
         </button>
 

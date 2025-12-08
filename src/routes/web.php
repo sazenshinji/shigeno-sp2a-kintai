@@ -15,70 +15,75 @@ Route::middleware('guest')->get('/admin/login', function () {
     return view('auth.adminlogin');
 })->name('admin.login');
 
-// 一般ユーザー向けページ
-Route::middleware(['auth', 'verified'])
-    ->prefix('attendance')
-    ->group(function () {
 
-        // 勤怠ホーム（打刻画面）
-        Route::get('/', [UserAttendanceController::class, 'index'])->name('attendance');
+// ==============================
+// ログイン必須 共通
+// ==============================
+Route::middleware(['auth'])->group(function () {
 
-        // 打刻用ルート
-        Route::post('/clock-in', [UserAttendanceController::class, 'clockIn'])->name('attendance.clockIn');
-        Route::post('/clock-out', [UserAttendanceController::class, 'clockOut'])->name('attendance.clockOut');
-        Route::post('/break-in', [UserAttendanceController::class, 'breakIn'])->name('attendance.breakIn');
-        Route::post('/break-out', [UserAttendanceController::class, 'breakOut'])->name('attendance.breakOut');
+    // =========================
+    // 一般ユーザー専用（verified）
+    // =========================
+    Route::middleware(['verified'])
+        ->prefix('attendance')
+        ->group(function () {
 
-        // 月次勤怠一覧表示
-        Route::get('/list', [DisplayController::class, 'monthly'])->name('attendance.list');
+            Route::get('/', [UserAttendanceController::class, 'index'])->name('attendance');
 
-        // 勤怠詳細画面（一般ユーザー）
-        Route::get('/detail/{date}', [DisplayController::class, 'detail'])
-            ->name('attendance.detail');
+            Route::post('/clock-in', [UserAttendanceController::class, 'clockIn'])->name('attendance.clockIn');
+            Route::post('/clock-out', [UserAttendanceController::class, 'clockOut'])->name('attendance.clockOut');
+            Route::post('/break-in', [UserAttendanceController::class, 'breakIn'])->name('attendance.breakIn');
+            Route::post('/break-out', [UserAttendanceController::class, 'breakOut'])->name('attendance.breakOut');
 
-        // 【追加】修正申請（POST）
-        Route::post('/detail/update', [DisplayController::class, 'update'])
-            ->name('attendance.detail.update');
+            Route::get('/list', [DisplayController::class, 'monthly'])->name('attendance.list');
+            Route::get('/detail/{date}', [DisplayController::class, 'detail'])->name('attendance.detail');
 
-        // 【追加】削除申請（POST）
-        Route::post('/detail/delete', [DisplayController::class, 'delete'])
-            ->name('attendance.detail.delete');
-    });
+            Route::post('/detail/update', [DisplayController::class, 'update'])->name('attendance.detail.update');
+            Route::post('/detail/delete', [DisplayController::class, 'delete'])->name('attendance.detail.delete');
+        });
 
-// 申請一覧（ユーザー・管理者 共通）
-Route::middleware(['auth'])
-    ->get('/stamp_correction_request/list', [DisplayController::class, 'requestList'])
-    ->name('request.list');
 
-// 管理者専用ページ
-Route::middleware(['auth', 'admin'])
-    ->prefix('admin')
-    ->name('admin.')
-    ->group(function () {
+    // =========================
+    // ユーザー・管理者 共通
+    // =========================
+    Route::get('/stamp_correction_request/list', [DisplayController::class, 'requestList'])
+        ->name('request.list');
 
-        // 日次勤怠一覧
-        Route::get('/attendance/list', [AdminConfirmController::class, 'daily'])
-            ->name('daily');
+    Route::get('/stamp_correction_request/approve/{id}', [DisplayController::class, 'requestDetail'])
+        ->name('request.detail');
 
-        // 管理者用 勤怠詳細表示
-        Route::get('/attendance/{user}/{date}', [DisplayController::class, 'adminDetail'])
-            ->name('attendance.detail');
-    });
 
-// 申請詳細（ユーザー・管理者 共通）
-Route::middleware(['auth'])
-    ->get(
-        '/stamp_correction_request/approve/{id}',
-        [DisplayController::class, 'requestDetail']
-    )
-    ->name('request.detail');
+    // =========================
+    // 管理者専用
+    // =========================
+    Route::middleware(['admin'])
+        ->prefix('admin')
+        ->name('admin.')
+        ->group(function () {
 
-// 管理者：申請承認処理
-Route::middleware(['auth', 'admin'])
-    ->post(
-        '/stamp_correction_request/approve/{id}',
-        [DisplayController::class, 'approve']
-    )->name('request.approve');
+            Route::get('/attendance/list', [AdminConfirmController::class, 'daily'])
+                ->name('daily');
 
+            Route::get('/staff/list', [AdminConfirmController::class, 'staffList'])
+                ->name('staff.list');
+
+            Route::get('/attendance/{user}/{date}', [DisplayController::class, 'adminDetail'])
+                ->name('attendance.detail');
+
+            Route::post(
+                '/attendance/{user}/{date}/update',
+                [DisplayController::class, 'adminImmediateUpdate']
+            )->name('attendance.immediateUpdate');
+
+            Route::post(
+                '/stamp_correction_request/approve/{id}',
+                [DisplayController::class, 'approve']
+            )->name('request.approve');
+        });
+});
+
+
+// ==============================
 // ログアウト（共通）
+// ==============================
 Route::post('/logout', LogoutController::class)->name('logout');

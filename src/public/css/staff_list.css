@@ -1,0 +1,76 @@
+.attendance-list-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding-top: 40px;
+}
+
+/* タイトル全体 */
+.page-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 100px;
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    position: relative;
+}
+
+/* 本物の縦線 */
+.page-title::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 7px;
+    height: 36px;
+    background-color: #000;
+    border-radius: 2px;
+}
+
+/* 表全体：白・角丸・枠なし */
+.attendance-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: #fff;
+    border-radius: 16px;      /* ★ 表全体の角丸 */
+    overflow: hidden;         /* ★ 角丸を効かせる */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); /* ★ 薄く影 */
+}
+
+/* 見出し・データ共通（枠線なし・白） */
+.attendance-table th,
+.attendance-table td {
+    border: none;             /* ★ 列の仕切り線を削除 */
+    padding: 14px 12px;
+    text-align: center;
+    background-color: #fff;   /* ★ 見出しも白 */
+}
+
+/* 見出しだけ少し強調 */
+.attendance-table th {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+/* ✅ 見出し行とデータ行の間だけ太い区切り線 */
+.attendance-table thead th {
+    border-bottom: 2px solid #ddd;  /* ★ データ行(1px)の約2倍 */
+}
+
+/* 行の区切りは下線だけ（データ行どうし） */
+.attendance-table tbody tr:not(:last-child) td {
+    border-bottom: 1px solid #eee;
+}
+
+/* 詳細ボタン：枠なし・背景なし・太字 */
+.detail-btn {
+    padding: 0;
+    border: none;             /* ★ 枠なし */
+    background: none;         /* ★ 背景なし */
+    font-weight: 700;         /* ★ 文字太め */
+    font-size: 15px;
+    color: #333;
+    cursor: not-allowed;
+}

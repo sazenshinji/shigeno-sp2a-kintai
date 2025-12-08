@@ -21,7 +21,12 @@ $layout = auth()->user()->role === 1
     <h1 class="page-title">勤怠詳細</h1>
 
     {{-- 修正・削除 共通フォーム --}}
-    <form method="POST" action="{{ route('attendance.detail.update') }}" novalidate>
+    <form method="POST"
+        action="{{ auth()->user()->role === 1
+        ? route('admin.attendance.immediateUpdate', ['user' => $user->id, 'date' => $date->format('Y-m-d')])
+        : route('attendance.detail.update') }}"
+        novalidate>
+
         @csrf
 
         {{-- 対象日 --}}

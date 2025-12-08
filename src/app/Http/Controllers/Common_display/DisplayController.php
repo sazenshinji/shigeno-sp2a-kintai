@@ -203,7 +203,7 @@ class DisplayController extends Controller
             ? $attendance->breaktimes()->orderBy('break_start')->get()
             : collect();
 
-        // ✅ 承認待ちかどうかを正しく判定（ユーザーと同じ判定）
+        // 承認待ちかどうかを正しく判定（ユーザーと同じ判定）
         $isPending = Correction::where('target_user_id', $user->id)
             ->where('status', 0) // 0 = 申請中
             ->whereHas('aftercorrection', function ($q) use ($date) {
@@ -395,5 +395,137 @@ class DisplayController extends Controller
         });
 
         return back()->with('success', '申請を承認しました。');
+    }
+
+    public function adminImmediateUpdate(DetailRequest $request, $userId, $date)
+    {
+        $admin = Auth::user(); // 操作者（管理者）
+        $targetUser = User::findOrFail($userId);
+        $date = Carbon::parse($date);
+        $action = $request->input('action'); // edit / delete
+
+        DB::transaction(function () use ($admin, $targetUser, $date, $request, $action) {
+
+            $attendance = Attendance::with('breaktimes')
+                ->where('user_id', $targetUser->id)
+                ->where('work_date', $date->format('Y-m-d'))
+                ->first();
+
+            // ===== ① 種別判定 =====
+            if (!$attendance) {
+                $type = 0; // 新規
+            } elseif ($action === 'delete') {
+                $type = 2; // 削除
+            } else {
+                $type = 1; // 修正
+            }
+
+            // ===== ② corrections 作成（即承認前提）=====
+            $correction = Correction::create([
+                'operate_user_id' => $admin->id,
+                'target_user_id'  => $targetUser->id,
+                'attendance_id'   => $attendance?->id,
+                'type'            => $type,
+                'reason'          => $request->input('reason', '管理者即時修正'),
+                'status'          => 0,
+                'approved_at'     => null,
+            ]);
+
+            $workDate = $date->format('Y-m-d');
+
+            // ===== ③ after_corrections =====
+            $afterCorrection = AfterCorrection::create([
+                'correction_id'   => $correction->id,
+                'after_work_date' => $workDate,
+                'after_clock_in' => Carbon::createFromFormat('Y-m-d H:i', $workDate . ' ' . $request->clock_in),
+                'after_clock_out' => Carbon::createFromFormat('Y-m-d H:i', $workDate . ' ' . $request->clock_out),
+            ]);
+
+            // ===== ④ after_breaks =====
+            $allBreaks = [];
+
+            foreach ($request->input('breaks', []) as $row) {
+                if (!empty($row['start']) && !empty($row['end'])) {
+                    $allBreaks[] = $row;
+                }
+            }
+
+            $extra = $request->input('extra_break', []);
+            if (!empty($extra['start']) && !empty($extra['end'])) {
+                $allBreaks[] = $extra;
+            }
+
+            foreach ($allBreaks as $index => $row) {
+                AfterBreak::create([
+                    'after_correction_id' => $afterCorrection->id,
+                    'break_index'        => $index + 1,
+                    'after_break_start' => Carbon::createFromFormat('Y-m-d H:i', $workDate . ' ' . $row['start']),
+                    'after_break_end'   => Carbon::createFromFormat('Y-m-d H:i', $workDate . ' ' . $row['end']),
+                ]);
+            }
+
+            // ===== ⑤ before_corrections（退避）=====
+            $beforeCorrection = BeforeCorrection::create([
+                'correction_id'     => $correction->id,
+                'before_work_date' => $attendance?->work_date,
+                'before_clock_in'  => $attendance?->clock_in,
+                'before_clock_out' => $attendance?->clock_out,
+            ]);
+
+            if ($attendance) {
+                foreach ($attendance->breaktimes as $b) {
+                    BeforeBreak::create([
+                        'before_correction_id' => $beforeCorrection->id,
+                        'break_index'          => $b->break_index,
+                        'before_break_start'  => $b->break_start,
+                        'before_break_end'    => $b->break_end,
+                    ]);
+                }
+            }
+
+            // ===== ⑥ 勤怠へ即反映 =====
+            if ($type === 0) {
+                // 新規
+                $attendance = Attendance::create([
+                    'user_id'   => $targetUser->id,
+                    'work_date' => $workDate,
+                    'clock_in'  => $afterCorrection->after_clock_in,
+                    'clock_out' => $afterCorrection->after_clock_out,
+                    'status'    => 3,
+                ]);
+            } elseif ($type === 1) {
+                // 修正
+                $attendance->update([
+                    'clock_in'  => $afterCorrection->after_clock_in,
+                    'clock_out' => $afterCorrection->after_clock_out,
+                    'status'    => 3,
+                ]);
+                $attendance->breaktimes()->delete();
+            } elseif ($type === 2) {
+                // 削除
+                $attendance?->delete();
+            }
+
+            // breaktimes 再作成（削除以外）
+            if ($type !== 2) {
+                foreach ($afterCorrection->afterBreaks as $b) {
+                    $attendance->breaktimes()->create([
+                        'break_index' => $b->break_index,
+                        'break_start' => $b->after_break_start,
+                        'break_end'   => $b->after_break_end,
+                    ]);
+                }
+            }
+
+            // ===== ⑦ 即承認 =====
+            $correction->update([
+                'status'      => 1,
+                'approved_at' => now(),
+            ]);
+        });
+
+        return redirect()
+            ->route('admin.daily', ['date' => $date->format('Y-m-d')])
+            ->with('success', '管理者による即時反映が完了しました。');
     }
 }

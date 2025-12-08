@@ -33,7 +33,7 @@
 
         {{-- スタッフ一覧 --}}
         <li>
-          <a href="{{ route('admin.daily') }}">スタッフ一覧</a>
+          <a href="{{ route('admin.staff.list') }}">スタッフ一覧</a>
         </li>
 
         {{-- 申請一覧 --}}
