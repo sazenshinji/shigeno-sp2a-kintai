@@ -67,29 +67,54 @@ class DisplayController extends Controller
         $user = Auth::user();
         $date = Carbon::parse($request->date);
 
-        $attendance = Attendance::with('breaktimes')
-            ->where('user_id', $user->id)
-            ->where('work_date', $date->format('Y-m-d'))
-            ->first();
-
-        $breaks = $attendance
-            ? $attendance->breaktimes()->orderBy('break_start')->get()
-            : collect();
-
-        // ★ 承認待ちチェック
-        $isPending = Correction::where('target_user_id', $user->id)
+        // 承認待ちデータ取得
+        $pendingCorrection = Correction::with([
+            'afterCorrection.afterBreaks'
+        ])
+            ->where('target_user_id', $user->id)
             ->where('status', 0)
-            ->whereHas('aftercorrection', function ($q) use ($date) {
+            ->whereHas('afterCorrection', function ($q) use ($date) {
                 $q->whereDate('after_work_date', $date->format('Y-m-d'));
             })
-            ->exists();
+            ->first();
+
+        if ($pendingCorrection) {
+
+            // 承認待ち → after 系
+            $attendance = $pendingCorrection->afterCorrection;
+            $breaks = $attendance
+                ? $attendance->afterBreaks()->orderBy('break_index')->get()
+                : collect();
+
+            $isPending = true;
+
+            // ★ 追加：備考に reason を渡す
+            $correctionReason = $pendingCorrection->reason;
+        } else {
+
+            // 通常勤怠
+            $attendance = Attendance::with('breaktimes')
+                ->where('user_id', $user->id)
+                ->where('work_date', $date->format('Y-m-d'))
+                ->first();
+
+            $breaks = $attendance
+                ? $attendance->breaktimes()->orderBy('break_start')->get()
+                : collect();
+
+            $isPending = false;
+
+            // 通常時は空文字
+            $correctionReason = '';
+        }
 
         return view('common_display.detail', compact(
             'user',
             'date',
             'attendance',
             'breaks',
-            'isPending'
+            'isPending',
+            'correctionReason'
         ));
     }
 
@@ -189,34 +214,57 @@ class DisplayController extends Controller
         return $this->update($request);
     }
 
+    /**
+     * 勤怠詳細表示(管理者)
+     */
     public function adminDetail($userId, $date)
     {
         $user = User::findOrFail($userId);
         $date = Carbon::parse($date);
 
-        $attendance = Attendance::with('breaktimes')
-            ->where('user_id', $user->id)
-            ->where('work_date', $date->format('Y-m-d'))
-            ->first();
-
-        $breaks = $attendance
-            ? $attendance->breaktimes()->orderBy('break_start')->get()
-            : collect();
-
-        // 承認待ちかどうかを正しく判定（ユーザーと同じ判定）
-        $isPending = Correction::where('target_user_id', $user->id)
-            ->where('status', 0) // 0 = 申請中
-            ->whereHas('aftercorrection', function ($q) use ($date) {
+        $pendingCorrection = Correction::with([
+            'afterCorrection.afterBreaks'
+        ])
+            ->where('target_user_id', $user->id)
+            ->where('status', 0)
+            ->whereHas('afterCorrection', function ($q) use ($date) {
                 $q->whereDate('after_work_date', $date->format('Y-m-d'));
             })
-            ->exists();
+            ->first();
+
+        if ($pendingCorrection) {
+
+            $attendance = $pendingCorrection->afterCorrection;
+            $breaks = $attendance
+                ? $attendance->afterBreaks()->orderBy('break_index')->get()
+                : collect();
+
+            $isPending = true;
+
+            // 承認待ち備考
+            $correctionReason = $pendingCorrection->reason;
+        } else {
+
+            $attendance = Attendance::with('breaktimes')
+                ->where('user_id', $user->id)
+                ->where('work_date', $date->format('Y-m-d'))
+                ->first();
+
+            $breaks = $attendance
+                ? $attendance->breaktimes()->orderBy('break_start')->get()
+                : collect();
+
+            $isPending = false;
+            $correctionReason = '';
+        }
 
         return view('common_display.detail', compact(
             'user',
             'date',
             'attendance',
             'breaks',
-            'isPending'
+            'isPending',
+            'correctionReason'
         ));
     }
 
@@ -580,7 +628,7 @@ class DisplayController extends Controller
     }
 
     /**
-     * 管理者用：スタッフ月次勤怠 CSV 出力
+     * 管理者用：スタッフ月次勤怠 CSV 出力（空の日も出力）
      * /admin/attendance/staff/{id}/csv?month=YYYY-MM
      */
     public function adminMonthlyCsv(Request $request, $id)
@@ -594,39 +642,73 @@ class DisplayController extends Controller
         $start = $current->copy()->startOfMonth();
         $end   = $current->copy()->endOfMonth();
 
-        // 勤怠データ取得
-        $attendances = Attendance::with('breaktimes')
+        // 月内の勤怠を Map 化（work_date => Attendance）
+        $attendanceMap = Attendance::with('breaktimes')
             ->where('user_id', $targetUser->id)
             ->whereBetween('work_date', [$start, $end])
-            ->orderBy('work_date')
-            ->get();
+            ->get()
+            ->keyBy(function ($item) {
+                return Carbon::parse($item->work_date)->format('Y-m-d');
+            });
 
-        // CSVヘッダー
-        $csvHeader = [
+        // CSV ヘッダー
+        $csvData = [];
+        $csvData[] = [
             '日付',
             '出勤',
             '退勤',
-            '休憩(分)',
-            '合計労働時間(分)',
+            '休憩',
+            '合計',
         ];
 
-        $csvData = [];
-        $csvData[] = $csvHeader;
+        // 月初〜月末まで「必ず1日ずつ」出力
+        $date = $start->copy();
+        while ($date <= $end) {
 
-        foreach ($attendances as $attendance) {
+            $key = $date->format('Y-m-d');
+            $attendance = $attendanceMap[$key] ?? null;
+
+            // 休憩時間（分 → H:MM 形式へ変換）
+            $breakMinutes = $attendance?->break_total_minutes;
+            if (!is_null($breakMinutes)) {
+                $breakH = floor($breakMinutes / 60);
+                $breakM = $breakMinutes % 60;
+                $breakTime = sprintf('%d:%02d', $breakH, $breakM); // 例: 1:30
+            } else {
+                $breakTime = '';
+            }
+
+            // 合計労働時間（分 → H:MM 形式へ変換）
+            $totalMinutes = $attendance?->total_working_minutes;
+            if (!is_null($totalMinutes)) {
+                $workH = floor($totalMinutes / 60);
+                $workM = $totalMinutes % 60;
+                $totalWorkTime = sprintf('%d:%02d', $workH, $workM); // 例: 7:30
+            } else {
+                $totalWorkTime = '';
+            }
+
+            // 曜日配列（Sun〜Sat → 日〜土）
+            $weekMap = ['日', '月', '火', '水', '木', '金', '土'];
+
+            // 日付＋曜日（例：2025-02-03(月)）
+            $dateWithWeek = $date->format('Y-m-d') . '(' . $weekMap[$date->dayOfWeek] . ')';
+
             $csvData[] = [
-                Carbon::parse($attendance->work_date)->format('Y-m-d'),
-                $attendance->clock_in ? Carbon::parse($attendance->clock_in)->format('H:i') : '',
-                $attendance->clock_out ? Carbon::parse($attendance->clock_out)->format('H:i') : '',
-                $attendance->break_total_minutes ?? 0,
-                $attendance->total_working_minutes ?? 0,
+                $dateWithWeek,   // ここが 曜日付き になる
+                $attendance?->clock_in ? Carbon::parse($attendance->clock_in)->format('H:i') : '',
+                $attendance?->clock_out ? Carbon::parse($attendance->clock_out)->format('H:i') : '',
+                $breakTime,
+                $totalWorkTime,
             ];
+
+            $date->addDay();
         }
 
         // ファイル名
         $fileName = $targetUser->name . '_勤怠_' . $current->format('Y_m') . '.csv';
 
-        // CSVレスポンス生成
+        // CSV ダウンロード設定
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => "attachment; filename={$fileName}",
@@ -635,7 +717,7 @@ class DisplayController extends Controller
         $callback = function () use ($csvData) {
             $stream = fopen('php://output', 'w');
 
-            // 文字化け防止（Excel用）
+            // Excel 文字化け防止
             fwrite($stream, "\xEF\xBB\xBF");
 
             foreach ($csvData as $row) {
@@ -647,5 +729,4 @@ class DisplayController extends Controller
 
         return response()->stream($callback, 200, $headers);
     }
-
 }

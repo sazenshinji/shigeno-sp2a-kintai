@@ -56,13 +56,21 @@ $layout = auth()->user()->role === 1
                     <th>出勤・退勤</th>
                     <td>
                         <input type="time" class="no-time-picker" name="clock_in"
-                            value="{{ old('clock_in', optional($attendance?->clock_in)->format('H:i')) }}"
+                            value="{{ old('clock_in',
+                                $isPending
+                                ? optional($attendance?->after_clock_in)->format('H:i')
+                                : optional($attendance?->clock_in)->format('H:i')
+                            ) }}"
                             {{ $isPending ? 'disabled' : '' }}>
 
                         <span class="time-separator">～</span>
 
                         <input type="time" class="no-time-picker" name="clock_out"
-                            value="{{ old('clock_out', optional($attendance?->clock_out)->format('H:i')) }}"
+                            value="{{ old('clock_out',
+                                $isPending
+                                    ? optional($attendance?->after_clock_out)->format('H:i')
+                                    : optional($attendance?->clock_out)->format('H:i')
+                            ) }}"
                             {{ $isPending ? 'disabled' : '' }}>
 
                         @error('clock_in')
@@ -79,31 +87,25 @@ $layout = auth()->user()->role === 1
                 <tr>
                     <th>{{ $i === 0 ? '休憩' : '' }}</th>
                     <td>
-                        <input
-                            type="time"
-                            class="no-time-picker"
+                        <input type="time" class="no-time-picker"
                             name="breaks[{{ $i }}][start]"
-                            value="{{ old("breaks.$i.start", optional($break->break_start)->format('H:i')) }}"
+                            value="{{ old("breaks.$i.start",
+                                $isPending
+                                ? optional($break->after_break_start)->format('H:i')
+                                : optional($break->break_start)->format('H:i')
+                            ) }}"
                             {{ $isPending ? 'disabled' : '' }}>
 
                         <span class="time-separator">～</span>
 
-                        <input
-                            type="time"
-                            class="no-time-picker"
+                        <input type="time" class="no-time-picker"
                             name="breaks[{{ $i }}][end]"
-                            value="{{ old("breaks.$i.end", optional($break->break_end)->format('H:i')) }}"
+                            value="{{ old("breaks.$i.end",
+                                $isPending
+                                    ? optional($break->after_break_end)->format('H:i')
+                                    : optional($break->break_end)->format('H:i')
+                            ) }}"
                             {{ $isPending ? 'disabled' : '' }}>
-
-                        {{-- 休憩「入り」エラー --}}
-                        @error("breaks.$i.start")
-                        <div class="field-error">{{ $message }}</div>
-                        @enderror
-
-                        {{-- 休憩「戻り」エラー --}}
-                        @error("breaks.$i.end")
-                        <div class="field-error">{{ $message }}</div>
-                        @enderror
                     </td>
                 </tr>
                 @endforeach
@@ -144,7 +146,7 @@ $layout = auth()->user()->role === 1
                 <tr>
                     <th>備考</th>
                     <td>
-                        <textarea name="reason" rows="3" {{ $isPending ? 'disabled' : '' }}>{{ old('reason') }}</textarea>
+                        <textarea name="reason" rows="3" {{ $isPending ? 'disabled' : '' }}>{{ old('reason', $isPending ? $correctionReason : '') }}</textarea>
 
                         @error('reason')
                         <div class="field-error">{{ $message }}</div>
