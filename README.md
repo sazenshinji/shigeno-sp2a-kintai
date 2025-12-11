@@ -83,7 +83,7 @@ chmod -R 777 storage
 
 bash
 
-cd coachtech/shigeno-sp1a-furima/
+cd coachtech/shigeno-sp2a-kintai/
 
 docker-compose exec mysql bash
 
@@ -101,6 +101,14 @@ bash
 
 CREATE DATABASE fleama_test;
 
+・mysql、MySQL コンテナから抜ける。
+
+bash
+
+exit
+
+exit
+
 1.2 src/config/database.php ファイルの変更
 
 （★ 編集済のため作業不要です。）
@@ -115,9 +123,11 @@ bash
 
 cp .env .env.testing
 
-・コピーしファイルの権限変更
+・PHP コンテナから抜け、コピーしファイルの権限変更
 
-sudo chmod -R 777 \*
+exit
+
+sudo chmod -R 777 *
 
 (パスワードを入力)
 
@@ -133,9 +143,9 @@ APP_NAME=Laravel
 
 - APP_KEY=base64:vPtYQu63T1fmcyeBgEPd0fJ+jvmnzjYMaUf7d5iuB+c=
 
-* APP_ENV=test
++ APP_ENV=test
 
-* APP_KEY=
++ APP_KEY=
 
 APP_DEBUG=true
 
@@ -149,7 +159,7 @@ APP_URL=http://localhost
 
 - DB_CONNECTION=mysql
 
-* DB_CONNECTION=mysql_test
++ DB_CONNECTION=mysql_test
 
 DB_HOST=mysql
 
@@ -161,15 +171,15 @@ DB_PORT=3306
 
 - DB_PASSWORD=laravel_pass
 
-* DB_DATABASE=fleama_test
++ DB_DATABASE=fleama_test
 
-* DB_USERNAME=root
++ DB_USERNAME=root
 
-* DB_PASSWORD=root
++ DB_PASSWORD=root
 
 ---
 
-・APP_KEY に新たなテスト用のアプリケーションキーを加える
+・PHPコンテナに入り、APP_KEY に新たなテスト用のアプリケーションキーを加える
 
 bash
 
@@ -192,6 +202,7 @@ php artisan migrate --seed --env=testing
 1.5 PHPUnit の設定ファイル「phpunit.xml」の編集
 
 （★ 編集済のため作業不要です。）
+
 
 ２．テストの実行
 
