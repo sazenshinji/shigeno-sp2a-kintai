@@ -112,7 +112,7 @@ $layout = auth()->user()->role === 1
 
                 {{-- 追加休憩（休憩２） --}}
                 <tr>
-                    <th>休憩２</th>
+                    <th>{{ $breaks->count() === 0 ? '休憩１' : '休憩２' }}</th>
                     <td>
                         <input
                             type="time"
@@ -162,7 +162,15 @@ $layout = auth()->user()->role === 1
 
             @if($isPending)
             <p class="pending-message">
-                ＊ 承認待ちのため修正はできません。
+                @php
+                $typeText = match($pendingType) {
+                0 => '追加',
+                1 => '修正',
+                2 => '削除',
+                default => '',
+                };
+                @endphp
+                ＊ 「{{ $typeText }}」承認待ちのため修正はできません。
             </p>
             @else
 

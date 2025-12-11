@@ -88,8 +88,9 @@ class DisplayController extends Controller
 
             $isPending = true;
 
-            // ★ 追加：備考に reason を渡す
+            // ★ 追加： reason,type を渡す
             $correctionReason = $pendingCorrection->reason;
+            $pendingType = $pendingCorrection->type;
         } else {
 
             // 通常勤怠
@@ -106,6 +107,7 @@ class DisplayController extends Controller
 
             // 通常時は空文字
             $correctionReason = '';
+            $pendingType = null;
         }
 
         return view('common_display.detail', compact(
@@ -114,7 +116,8 @@ class DisplayController extends Controller
             'attendance',
             'breaks',
             'isPending',
-            'correctionReason'
+            'correctionReason',
+            'pendingType'
         ));
     }
 
@@ -241,8 +244,9 @@ class DisplayController extends Controller
 
             $isPending = true;
 
-            // 承認待ち備考
+            // 承認待ちreason,type
             $correctionReason = $pendingCorrection->reason;
+            $pendingType = $pendingCorrection->type;
         } else {
 
             $attendance = Attendance::with('breaktimes')
@@ -256,6 +260,7 @@ class DisplayController extends Controller
 
             $isPending = false;
             $correctionReason = '';
+            $pendingType = null;
         }
 
         return view('common_display.detail', compact(
@@ -264,7 +269,8 @@ class DisplayController extends Controller
             'attendance',
             'breaks',
             'isPending',
-            'correctionReason'
+            'correctionReason',
+            'pendingType'
         ));
     }
 

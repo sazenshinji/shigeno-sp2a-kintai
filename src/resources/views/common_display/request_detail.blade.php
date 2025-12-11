@@ -95,7 +95,15 @@ $layout = auth()->user()->role === 1
         {{-- ユーザー ＋ 承認待ち → メッセージ表示 --}}
         @elseif(auth()->user()->role !== 1 && !$isApproved)
         <p class="pending-message">
-            ＊ 承認待ちのため修正はできません。
+            @php
+            $typeText = match($correction->type) {
+            0 => '追加',
+            1 => '修正',
+            2 => '削除',
+            default => '',
+            };
+            @endphp
+            ＊ 「{{ $typeText }}」承認待ちのため修正はできません。
         </p>
 
         {{-- 承認済みタブから来た場合（管理者・ユーザー共通）→ 何も出さない --}}

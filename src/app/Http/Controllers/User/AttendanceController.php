@@ -40,6 +40,7 @@ class AttendanceController extends Controller
     {
         $user = Auth::user();
         $today = Carbon::today();
+        $now = now()->seconds(0); // 秒を 00 に切り捨て
 
         // すでに今日の勤怠があれば取得
         $attendance = Attendance::where('user_id', $user->id)
@@ -58,7 +59,7 @@ class AttendanceController extends Controller
             $attendance->work_date = $today->toDateString();
         }
 
-        $attendance->clock_in = now();
+        $attendance->clock_in = $now;
         $attendance->status   = Attendance::STATUS_WORKING;
         $attendance->save();
 
@@ -76,6 +77,7 @@ class AttendanceController extends Controller
     {
         $user = Auth::user();
         $today = Carbon::today();
+        $now = now()->seconds(0); // 秒を 00 に切り捨て
 
         $attendance = Attendance::where('user_id', $user->id)
             ->where('work_date', $today->toDateString())
@@ -87,7 +89,7 @@ class AttendanceController extends Controller
                 ->with('error', '退勤できる状態ではありません。');
         }
 
-        $attendance->clock_out = now();
+        $attendance->clock_out = $now;
         $attendance->status    = Attendance::STATUS_DONE;
         $attendance->save();
 
@@ -105,6 +107,7 @@ class AttendanceController extends Controller
     {
         $user = Auth::user();
         $today = Carbon::today();
+        $now = now()->seconds(0); // 秒を 00 に切り捨て
 
         $attendance = Attendance::where('user_id', $user->id)
             ->where('work_date', $today->toDateString())
@@ -123,7 +126,7 @@ class AttendanceController extends Controller
         Breaktime::create([
             'attendance_id' => $attendance->id,
             'break_index'   => $nextIndex,
-            'break_start'   => now(),
+            'break_start'   => $now,
             'break_end'     => null,
         ]);
 
@@ -142,6 +145,7 @@ class AttendanceController extends Controller
     {
         $user = Auth::user();
         $today = Carbon::today();
+        $now = now()->seconds(0); // 秒を 00 に切り捨て
 
         $attendance = Attendance::where('user_id', $user->id)
             ->where('work_date', $today->toDateString())
@@ -162,7 +166,7 @@ class AttendanceController extends Controller
                 ->with('error', '未終了の休憩が見つかりませんでした。');
         }
 
-        $break->break_end = now();
+        $break->break_end = $now;
         $break->save();
 
         $attendance->status = Attendance::STATUS_WORKING;
